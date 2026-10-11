@@ -6,7 +6,9 @@ members = [
     "crates/storage",
     "crates/database",
     "crates/redis-queue",
+    "crates/worker-core",
     "services/api",
+    "services/worker",
 ]
 
 [workspace.package]

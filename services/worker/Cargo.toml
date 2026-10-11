@@ -1,0 +1,29 @@
+[package]
+name = "imageforge-worker"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+description = "ImageForge conversion worker: consumes jobs, runs the engine, stores results."
+
+# The binary links the full cloud-TLS dependency set (sqlx + redis + native-tls).
+# On the local windows-gnu toolchain (llvm-dlltool workaround, no C compiler)
+# that combination produces a binary that faults at startup, so its local test
+# harness is disabled. The conversion core is unit-tested in `worker-core`, and
+# the orchestration loop is verified end-to-end with live services and in CI
+# (Linux, where this toolchain limitation does not apply).
+[[bin]]
+name = "imageforge-worker"
+path = "src/main.rs"
+test = false
+
+[dependencies]
+imageforge-worker-core = { path = "../../crates/worker-core" }
+imageforge-job-queue = { path = "../../crates/job-queue" }
+imageforge-storage = { path = "../../crates/storage" }
+imageforge-database = { path = "../../crates/database" }
+imageforge-redis-queue = { path = "../../crates/redis-queue" }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "signal"] }
+tracing.workspace = true
+tracing-subscriber.workspace = true

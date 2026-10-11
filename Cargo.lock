@@ -1150,6 +1150,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "imageforge-worker"
+version = "0.1.0"
+dependencies = [
+ "imageforge-database",
+ "imageforge-job-queue",
+ "imageforge-redis-queue",
+ "imageforge-storage",
+ "imageforge-worker-core",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "imageforge-worker-core"
+version = "0.1.0"
+dependencies = [
+ "bytes",
+ "image",
+ "imageforge-engine",
+ "imageforge-job-queue",
+ "imageforge-storage",
+ "thiserror 2.0.21",
+ "tokio",
+]
+
+[[package]]
 name = "indexmap"
 version = "2.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
