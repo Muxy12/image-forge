@@ -9,7 +9,7 @@ import { defineRouting } from "next-intl/routing";
  * by the SEO registry (e.g. `png-to-webp` vs `png-en-webp`).
  */
 export const routing = defineRouting({
-  locales: ["en", "fr"],
+  locales: ["en", "fr", "es", "de"],
   defaultLocale: "en",
   localePrefix: "always",
   pathnames: {
@@ -17,6 +17,8 @@ export const routing = defineRouting({
     "/convert/[slug]": {
       en: "/convert/[slug]",
       fr: "/convertir/[slug]",
+      es: "/convertir/[slug]",
+      de: "/umwandeln/[slug]",
     },
   },
 });

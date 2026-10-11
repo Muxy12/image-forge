@@ -11,7 +11,7 @@ and workloads the browser cannot handle. Heavy processing stays off Vercel.
 ```
 ImageForge/
 ├── apps/
-│   └── web/                 # Next.js frontend (TS, Tailwind, next-intl en/fr)
+│   └── web/                 # Next.js frontend (TS, Tailwind, next-intl en/fr/es/de)
 │       └── src/
 │           ├── app/[locale]/         # localized routes (home, convert/[slug])
 │           ├── components/converter/ # browser-side converter UI

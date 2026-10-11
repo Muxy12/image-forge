@@ -1,0 +1,60 @@
+{
+  "site": {
+    "name": "ImageForge",
+    "tagline": "Schnelle, private Bildkonvertierung",
+    "description": "Konvertiere deine Bilder zwischen PNG, JPG und WebP im Browser. Schnell, kostenlos und privat."
+  },
+  "home": {
+    "heroTitle": "Bilder sofort konvertieren. Schnell, kostenlos und privat.",
+    "heroSubtitle": "Konvertiere zwischen PNG, JPG und WebP direkt im Browser. Kein Upload, kein Konto, kein Warten.",
+    "popularTitle": "Beliebte Konvertierungen",
+    "benefitsTitle": "Warum ImageForge",
+    "benefitPrivateTitle": "Privat als Standard",
+    "benefitPrivateBody": "PNG-, JPG- und WebP-Konvertierungen laufen vollständig im Browser. Deine Dateien werden nie hochgeladen.",
+    "benefitFastTitle": "Schnell",
+    "benefitFastBody": "Konvertierungen erfolgen lokal, ohne Netzwerk-Roundtrip und außerhalb des Hauptthreads, damit die Seite reaktionsfähig bleibt.",
+    "benefitDevTitle": "Für Entwickler gemacht",
+    "benefitDevBody": "Eine versionierte REST-API und eine Konvertierungs-Engine treiben dieselben Konvertierungen an, die du hier siehst.",
+    "footer": "Browserseitige Konvertierung für PNG, JPG und WebP. AVIF und ein serverseitiger Pfad für große bzw. Stapel-Jobs sind in Arbeit."
+  },
+  "converter": {
+    "dropTitle": "Bild ablegen oder zum Auswählen klicken",
+    "dropHint": "PNG, JPG oder WebP · lokal verarbeitet",
+    "source": "Quelle",
+    "dimensions": "Abmessungen",
+    "size": "Größe",
+    "convertTo": "Umwandeln in",
+    "quality": "Qualität",
+    "lossless": "verlustfrei",
+    "convert": "Konvertieren",
+    "converting": "Konvertiere…",
+    "reset": "Zurücksetzen",
+    "output": "Ausgabe",
+    "change": "Änderung",
+    "time": "Dauer",
+    "download": "{name} herunterladen",
+    "unsupportedOption": "(hier nicht unterstützt)",
+    "errUnsupportedFile": "Nicht unterstützte Datei. Verwende ein PNG-, JPG- oder WebP-Bild.",
+    "errUnreadable": "Dein Browser konnte dieses Bild nicht lesen.",
+    "errPickDifferent": "Wähle ein anderes Ausgabeformat als das Quellformat.",
+    "errFailed": "Die Konvertierung ist fehlgeschlagen.",
+    "unavailable": "Dein Browser unterstützt keine lokale Konvertierung (OffscreenCanvas / Web Workers). Ein serverseitiger Pfad ist als Alternative geplant."
+  },
+  "nav": {
+    "home": "Startseite",
+    "conversions": "Konvertierungen",
+    "skipToContent": "Zum Inhalt springen",
+    "language": "Sprache",
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "convertPage": {
+    "breadcrumbHome": "Startseite",
+    "breadcrumbConvert": "Umwandeln",
+    "howToTitle": "So konvertierst du",
+    "prosTitle": "Vorteile",
+    "consTitle": "Gut zu wissen",
+    "faqTitle": "Häufige Fragen",
+    "relatedTitle": "Verwandte Konvertierungen",
+    "processedLocally": "Lokal im Browser konvertiert — ohne Upload."
+  }
+}

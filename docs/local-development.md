@@ -16,10 +16,11 @@ pnpm install
 pnpm run dev        # http://localhost:3000 (turbo → next dev)
 pnpm run typecheck  # tsc --noEmit
 pnpm run test       # Vitest unit tests
-pnpm run build      # production build (19 static pages)
+pnpm run build      # production build (33 static pages)
 ```
-Localized URLs: `/en`, `/fr`, `/en/convert/png-to-webp`,
-`/fr/convertir/png-en-webp`. PNG/JPG/WebP conversions run locally in a Web
+Locales: en/fr/es/de. Example URLs: `/en/convert/png-to-webp`,
+`/fr/convertir/png-en-webp`, `/es/convertir/png-a-webp`,
+`/de/umwandeln/png-in-webp`. PNG/JPG/WebP conversions run locally in a Web
 Worker — no backend required.
 
 ## Rust workspace (repo root)
