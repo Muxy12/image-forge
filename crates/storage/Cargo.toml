@@ -12,6 +12,8 @@ async-trait = "0.1"
 bytes = "1"
 thiserror.workspace = true
 uuid = { version = "1", features = ["v4"] }
+# native-tls backend keeps the S3/R2 client off ring's C build on windows-gnu.
+rust-s3 = { version = "0.35", default-features = false, features = ["use-tokio-native-tls"] }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt"] }

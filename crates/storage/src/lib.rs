@@ -18,6 +18,9 @@ use async_trait::async_trait;
 use bytes::Bytes;
 use uuid::Uuid;
 
+mod s3;
+pub use s3::S3Store;
+
 /// Storage configuration, typically from environment.
 #[derive(Debug, Clone)]
 pub struct StorageConfig {
