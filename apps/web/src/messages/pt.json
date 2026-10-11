@@ -1,0 +1,60 @@
+{
+  "site": {
+    "name": "ImageForge",
+    "tagline": "Conversão de imagens rápida e privada",
+    "description": "Converta suas imagens entre PNG, JPG e WebP no navegador. Rápido, gratuito e privado."
+  },
+  "home": {
+    "heroTitle": "Converta imagens instantaneamente. Rápido, gratuito e privado.",
+    "heroSubtitle": "Converta entre PNG, JPG e WebP diretamente no seu navegador. Sem upload, sem conta, sem espera.",
+    "popularTitle": "Conversões populares",
+    "benefitsTitle": "Por que ImageForge",
+    "benefitPrivateTitle": "Privado por padrão",
+    "benefitPrivateBody": "As conversões PNG, JPG e WebP são executadas inteiramente no seu navegador. Seus arquivos nunca são enviados.",
+    "benefitFastTitle": "Rápido",
+    "benefitFastBody": "As conversões são locais, sem ida e volta pela rede, e fora da thread principal para manter a página fluida.",
+    "benefitDevTitle": "Feito para desenvolvedores",
+    "benefitDevBody": "Uma API REST versionada e um motor de conversão impulsionam as mesmas conversões que você vê aqui.",
+    "footer": "Conversão no navegador para PNG, JPG e WebP. AVIF e um processamento no servidor para grandes lotes estão em desenvolvimento."
+  },
+  "converter": {
+    "dropTitle": "Solte uma imagem ou clique para escolher",
+    "dropHint": "PNG, JPG ou WebP · processado localmente",
+    "source": "Origem",
+    "dimensions": "Dimensões",
+    "size": "Tamanho",
+    "convertTo": "Converter para",
+    "quality": "Qualidade",
+    "lossless": "sem perdas",
+    "convert": "Converter",
+    "converting": "Convertendo…",
+    "reset": "Redefinir",
+    "output": "Saída",
+    "change": "Variação",
+    "time": "Tempo",
+    "download": "Baixar {name}",
+    "unsupportedOption": "(indisponível aqui)",
+    "errUnsupportedFile": "Arquivo não compatível. Use uma imagem PNG, JPG ou WebP.",
+    "errUnreadable": "Seu navegador não conseguiu ler essa imagem.",
+    "errPickDifferent": "Escolha um formato de saída diferente do de origem.",
+    "errFailed": "A conversão falhou.",
+    "unavailable": "Seu navegador não oferece suporte à conversão local (OffscreenCanvas / Web Workers). Um processamento no servidor está planejado como alternativa."
+  },
+  "nav": {
+    "home": "Início",
+    "conversions": "Conversões",
+    "skipToContent": "Pular para o conteúdo",
+    "language": "Idioma",
+    "rights": "Todos os direitos reservados."
+  },
+  "convertPage": {
+    "breadcrumbHome": "Início",
+    "breadcrumbConvert": "Converter",
+    "howToTitle": "Como converter",
+    "prosTitle": "Vantagens",
+    "consTitle": "Bom saber",
+    "faqTitle": "Perguntas frequentes",
+    "relatedTitle": "Conversões relacionadas",
+    "processedLocally": "Convertido localmente no seu navegador — sem upload."
+  }
+}

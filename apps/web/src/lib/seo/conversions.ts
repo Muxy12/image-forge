@@ -293,6 +293,112 @@ const PACKS: Record<Locale, Pack> = {
       { q: "Was passiert mit transparenten Bereichen?", a: c.transparency },
     ],
   },
+
+  pt: {
+    slugSep: "para",
+    transparency: {
+      preserved: "A transparência é preservada.",
+      flattened:
+        "O formato de destino não tem canal alfa, por isso as áreas transparentes são achatadas sobre um fundo branco.",
+      none: "Nenhuma transparência envolvida.",
+    },
+    qualityStep: (lossy) =>
+      lossy ? " e ajuste a qualidade se necessário" : " (codificação sem perdas)",
+    title: (f, t) => `Converter ${f} para ${t} — conversor ${t} online e gratuito`,
+    description: (f, t) =>
+      `Converta imagens ${f} para ${t} diretamente no seu navegador. Privado, rápido e gratuito, sem necessidade de upload.`,
+    h1: (f, t) => `Converter ${f} para ${t}`,
+    intro: (f, t, transparency) =>
+      `Converta arquivos ${f} para ${t} sem sair do navegador. ${transparency} Suas imagens nunca são enviadas a um servidor.`,
+    howTo: (f, t, qs) => [
+      `Solte sua imagem ${f} ou clique para escolhê-la.`,
+      `Selecione ${t} como formato de saída${qs}.`,
+      `Clique em Converter e baixe seu arquivo ${t}.`,
+    ],
+    pros: (c) => [
+      "Processamento 100% local: seus arquivos permanecem no seu dispositivo.",
+      c.lossy
+        ? `${c.t} comprime fotos de forma eficiente para arquivos menores.`
+        : `${c.t} é sem perdas: nenhuma degradação da imagem.`,
+      c.alpha
+        ? `${c.t} oferece suporte a transparência.`
+        : `${c.t} é ideal para fotos e amplamente compatível.`,
+    ],
+    cons: (c) => [
+      c.alpha
+        ? `Alguns softwares antigos lidam mal com ${c.t}.`
+        : `${c.t} não oferece suporte a transparência.`,
+      c.lossy
+        ? "Qualidade muito baixa pode introduzir artefatos visíveis."
+        : "A codificação sem perdas pode gerar arquivos maiores que um formato com perdas.",
+    ],
+    faq: (c) => [
+      {
+        q: `A conversão de ${c.f} para ${c.t} é sem perdas?`,
+        a: c.lossy
+          ? `${c.t} é um formato com perdas: a qualidade depende do ajuste escolhido.${c.fromJpeg ? " Como o JPG de origem já está comprimido, nenhuma qualidade é recuperada." : ""}`
+          : `Sim. ${c.t} armazena os pixels sem perdas nesta conversão.`,
+      },
+      {
+        q: "Minhas imagens são enviadas?",
+        a: "Não. A conversão acontece no seu navegador; nenhum arquivo é enviado.",
+      },
+      { q: "O que acontece com as áreas transparentes?", a: c.transparency },
+    ],
+  },
+
+  it: {
+    slugSep: "in",
+    transparency: {
+      preserved: "La trasparenza viene mantenuta.",
+      flattened:
+        "Il formato di destinazione non ha un canale alfa, quindi le aree trasparenti vengono appiattite su uno sfondo bianco.",
+      none: "Nessuna trasparenza coinvolta.",
+    },
+    qualityStep: (lossy) =>
+      lossy ? " e regola la qualità se necessario" : " (codifica senza perdita)",
+    title: (f, t) => `Convertire ${f} in ${t} — convertitore ${t} online e gratuito`,
+    description: (f, t) =>
+      `Converti immagini ${f} in ${t} direttamente nel browser. Privato, veloce e gratuito, senza bisogno di caricare file.`,
+    h1: (f, t) => `Convertire ${f} in ${t}`,
+    intro: (f, t, transparency) =>
+      `Converti i file ${f} in ${t} senza uscire dal browser. ${transparency} Le tue immagini non vengono mai inviate a un server.`,
+    howTo: (f, t, qs) => [
+      `Trascina la tua immagine ${f} o fai clic per sceglierla.`,
+      `Seleziona ${t} come formato di output${qs}.`,
+      `Fai clic su Converti e scarica il tuo file ${t}.`,
+    ],
+    pros: (c) => [
+      "Elaborazione 100% locale: i tuoi file restano sul tuo dispositivo.",
+      c.lossy
+        ? `${c.t} comprime le foto in modo efficiente per file più leggeri.`
+        : `${c.t} è senza perdita: nessun degrado dell'immagine.`,
+      c.alpha
+        ? `${c.t} supporta la trasparenza.`
+        : `${c.t} è ideale per le foto ed è ampiamente compatibile.`,
+    ],
+    cons: (c) => [
+      c.alpha
+        ? `Alcuni software datati gestiscono male ${c.t}.`
+        : `${c.t} non supporta la trasparenza.`,
+      c.lossy
+        ? "Una qualità troppo bassa può introdurre artefatti visibili."
+        : "La codifica senza perdita può produrre file più grandi di un formato con perdita.",
+    ],
+    faq: (c) => [
+      {
+        q: `La conversione da ${c.f} a ${c.t} è senza perdita?`,
+        a: c.lossy
+          ? `${c.t} è un formato con perdita: la qualità dipende dall'impostazione scelta.${c.fromJpeg ? " Poiché il JPG di origine è già compresso, non si recupera qualità." : ""}`
+          : `Sì. ${c.t} memorizza i pixel senza perdita in questa conversione.`,
+      },
+      {
+        q: "Le mie immagini vengono caricate?",
+        a: "No. La conversione avviene nel browser; nessun file viene inviato.",
+      },
+      { q: "Cosa succede alle aree trasparenti?", a: c.transparency },
+    ],
+  },
 };
 
 function slugFor(from: ImageFormatToken, to: ImageFormatToken, locale: Locale): string {

@@ -6,5 +6,5 @@ export default createMiddleware(routing);
 
 export const config = {
   // Match all pathnames except Next internals and files with an extension.
-  matcher: ["/", "/(en|fr|es|de)/:path*", "/((?!_next|_vercel|.*\\..*).*)"],
+  matcher: ["/", "/(en|fr|es|de|pt|it)/:path*", "/((?!_next|_vercel|.*\\..*).*)"],
 };

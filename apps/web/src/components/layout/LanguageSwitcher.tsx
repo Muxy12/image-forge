@@ -7,7 +7,14 @@ import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { counterpartSlug } from "@/lib/seo/conversions";
 
-const LABELS: Record<Locale, string> = { en: "EN", fr: "FR", es: "ES", de: "DE" };
+const LABELS: Record<Locale, string> = {
+  en: "EN",
+  fr: "FR",
+  es: "ES",
+  de: "DE",
+  pt: "PT",
+  it: "IT",
+};
 
 /**
  * Switches locale while staying on the current page. On a conversion page it

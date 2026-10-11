@@ -17,10 +17,11 @@ and verified in a real browser. Everything marked ✅ was executed and observed.
   `C:\Program Files\nodejs`); `packageManager` is pinned to `pnpm@9.15.4`.
 
 ## i18n ✅ (next-intl 4)
-- Locales **en/fr/es/de**, always-prefixed URLs, localized pathnames:
-  `/convert/[slug]` (en) · `/convertir/[slug]` (fr, es) · `/umwandeln/[slug]`
-  (de), with per-conversion localized slugs (`png-to-webp` / `png-en-webp` /
-  `png-a-webp` / `png-in-webp`). Localized copy lives in `PACKS` per locale.
+- Locales **en/fr/es/de/pt/it**, always-prefixed URLs, localized pathnames:
+  `/convert` (en) · `/convertir` (fr, es) · `/umwandeln` (de) · `/converter`
+  (pt) · `/convertire` (it), each `[slug]` localized per conversion
+  (`png-to-webp` / `png-en-webp` / `png-a-webp` / `png-in-webp` /
+  `png-para-webp` / `png-in-webp`). Localized copy lives in `PACKS` per locale.
 - `src/i18n/{routing,navigation,request}.ts`, `src/middleware.ts`,
   `messages/{en,fr}.json`, `app/[locale]/layout.tsx`. Converter and all chrome
   are translated; verified no en/fr mixing (FR page is fully French).
@@ -33,12 +34,12 @@ and verified in a real browser. Everything marked ✅ was executed and observed.
   canonical, hreflang en/fr/x-default, Open Graph), H1, format-specific intro,
   how-to, pros/cons, FAQ, related links, embedded converter, BreadcrumbList +
   FAQPage JSON-LD, breadcrumb nav.
-- `app/sitemap.ts` (28 published URLs only), `app/robots.ts`.
+- `app/sitemap.ts` (42 published URLs only), `app/robots.ts`.
 - **Verified in the running app:** `/` → `/en` redirect; titles/canonical/
   hreflang correct in served HTML (1 canonical, 3 hreflang); sitemap lists only
-  the 28 published URLs; `/fr/convertir/png-en-webp` 200 and fully French;
+  the 42 published URLs; `/fr/convertir/png-en-webp` 200 and fully French;
   `/en/convert/png-to-avif` → 404 (unsupported pair is not generated).
-- `pnpm run build` → 33 static pages; `typecheck` and 18 Vitest tests pass.
+- `pnpm run build` → 47 static pages; `typecheck` and 18 Vitest tests pass.
 
 ## Shared layout + language switcher ✅
 - `components/layout/Header.tsx` (brand + switcher, sticky), `Footer.tsx`
@@ -131,8 +132,8 @@ installing either:
 - **AVIF/HEIC/SVG/TIFF/GIF:** not implemented. AVIF encode needs native libaom
   (same linker prerequisite); others need more codecs. Both the engine and the
   SEO registries intentionally exclude them so nothing advertises them.
-- **Additional locales (pt/it):** architecture is ready; en/fr/es/de have full
-  message catalogs and SEO content.
+- **Locales:** en/fr/es/de/pt/it all have full message catalogs and SEO
+  content. Adding another is a routing entry + a `PACKS` entry + a catalog.
 
 ## Exact next steps
 1. **Unblock Rust linking** (MSVC or MinGW), then `cargo run -p imageforge-api`,
