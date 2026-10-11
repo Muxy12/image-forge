@@ -49,6 +49,21 @@ After completing work:
 Discover and document the actual commands after initializing the repository.
 Do not invent commands that have not been verified.
 
+## Skill usage policy
+
+Before implementing a feature, inspect the installed skills and use the relevant ones.
+
+- **Next.js and React:** vercel-react-best-practices
+- **Rust backend and image processing:** rust-best-practices
+- **UI/UX implementation:** frontend-design and shadcn
+- **SEO landing pages:** programmatic-seo
+- **End-to-end testing:** webapp-testing
+- **Final verification:** verification-before-completion
+
+Do not load all skills for every task. Select only the skills relevant to the current implementation phase.
+Prioritize working code, automated tests, security, performance and maintainability.
+Never mark a feature as complete without executing the relevant verification steps.
+
 ## Important
 
 - Never expose secrets.
