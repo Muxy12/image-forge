@@ -1,0 +1,23 @@
+[package]
+name = "imageforge-redis-queue"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+description = "ImageForge job queue over Redis Streams (consumer groups, ack, reclaim)."
+
+[dependencies]
+imageforge-job-queue = { path = "../job-queue" }
+# native-tls (SChannel/OpenSSL) keeps us off ring's C build on windows-gnu.
+redis = { version = "0.27", default-features = false, features = [
+    "tokio-comp",
+    "tokio-native-tls-comp",
+    "connection-manager",
+    "streams",
+] }
+uuid = { version = "1", features = ["v4"] }
+thiserror.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

@@ -1,6 +1,13 @@
 [workspace]
 resolver = "2"
-members = ["crates/engine", "crates/job-queue", "crates/storage", "crates/database", "services/api"]
+members = [
+    "crates/engine",
+    "crates/job-queue",
+    "crates/storage",
+    "crates/database",
+    "crates/redis-queue",
+    "services/api",
+]
 
 [workspace.package]
 edition = "2021"
