@@ -5,9 +5,12 @@ _Last updated: 2026-10-11_
 ## Current phase
 
 Phase 1 (foundation) done. Phase 2 (engine) core done. Phase 3 (browser
-conversion) MVP done and verified end-to-end. Tooling migrated to **pnpm +
-Turborepo**. **i18n (next-intl, en/fr)** and **Phase 6 SEO** landing pages done
-and verified in a real browser. Everything marked ✅ was executed and observed.
+conversion) MVP done and verified end-to-end. Tooling on **pnpm + Turborepo**.
+**i18n (next-intl, en/fr/es/de/pt/it)** and **Phase 6 SEO** landing pages done
+and verified in a real browser. The **Rust toolchain is unblocked** and the
+**HTTP API is built, tested (6 integration tests), and verified live over
+HTTP**. A typed **TypeScript SDK** (Phase 7, partial) is in place. Everything
+marked ✅ was executed and observed.
 
 ## Monorepo tooling ✅
 - **pnpm workspaces** (`pnpm-workspace.yaml`: `apps/*`, `packages/*`) +
@@ -83,15 +86,19 @@ PNG ↔ JPG ↔ WebP entirely in-browser via a Web Worker (OffscreenCanvas +
   (`photo.webp`, blob URL). PNG→WebP, PNG→JPEG, WebP→PNG all produced the
   correct MIME type under the app's COOP/COEP headers.
 
-### HTTP API — `services/api/` ⚠️ code-complete, run-blocked by toolchain
+### HTTP API — `services/api/` ✅ built, tested, and verified live
 Thin Axum layer over the engine:
 - `GET /health/live`, `GET /health/ready`
 - `GET /v1/formats`, `GET /v1/conversions` (derived from the engine registry)
 - `POST /v1/convert` (multipart → engine; 25 MiB body limit; structured JSON
   errors with stable codes + request id).
-- `cargo check -p imageforge-api` and `cargo clippy` → **clean** (type-checked,
-  lint-clean). It is **not** build-run-verified here: see the toolchain
-  prerequisite. No endpoint has been hit with a live request yet.
+- **Toolchain unblocked** (see below): `cargo build`/`test`/`run` all work.
+  6 integration tests pass (`cargo test -p imageforge-api`).
+- **Verified live over HTTP** (server on :8080): `/health/live` and
+  `/health/ready` → ok; `/v1/conversions` lists the 6 pairs; `POST /v1/convert`
+  PNG→WebP returned `image/webp` (RIFF/WEBP), PNG→JPG with resize returned
+  `image/jpeg`; unsupported `avif` → 415 `UNSUPPORTED_CONVERSION`; missing file
+  → 400 `MISSING_FILE`.
 
 ## TypeScript SDK ✅ (Phase 7, partial)
 - `packages/sdk-typescript` (`@imageforge/sdk`): typed client mirroring the
@@ -100,12 +107,11 @@ Thin Axum layer over the engine:
   enforced server-side). `typecheck` clean; **5 Vitest tests** pass.
 - `docs/api.md` documents only implemented endpoints and the error envelope.
 
-## API integration tests (compile-verified; run pending linker)
+## API integration tests ✅
 - `services/api` has `#[tokio::test]` coverage via `tower::ServiceExt::oneshot`:
   health, `/v1/conversions`, real PNG→WebP multipart convert (asserts WebP
   signature + decoded dims), 415 unsupported, 400 missing-file, 400
-  unknown-format. `cargo check -p imageforge-api --tests` passes; they run once
-  the toolchain links (below).
+  unknown-format. `cargo test -p imageforge-api` → **6 passed**.
 
 ## Verified commands
 
@@ -118,16 +124,21 @@ Thin Axum layer over the engine:
   `pnpm run typecheck` ✅
 
 ### Rust — repo root
-- `cargo test -p imageforge-engine` ✅ · `cargo clippy --workspace` ✅ ·
-  `cargo fmt --all --check` ✅ · `cargo check --workspace` ✅
-- `cargo build`/run of `imageforge-api` ❌ — blocked (below).
+First `source scripts/dev-env.sh` (Windows linker workaround), then:
+- `cargo test --workspace` ✅ (**21 tests**: engine 15 + API 6) ·
+  `cargo clippy --workspace -- -D warnings` ✅ · `cargo fmt --all --check` ✅ ·
+  `cargo build -p imageforge-api` / `cargo run -p imageforge-api` ✅
 
-## Environment prerequisite (blocks running the API/worker)
+## Toolchain note (Windows x86_64-pc-windows-gnu) — resolved locally
 
-Active toolchain is `x86_64-pc-windows-gnu` with no MinGW, so there is no
-`dlltool`/linker; crates needing Windows import libraries (`windows-sys` via
-Tokio) cannot **link** a final binary. `cargo check`/`clippy` work (no link
-step), which is why the API is type-verified but not runnable here. Fix by
+Active toolchain is `x86_64-pc-windows-gnu`. rustup's bundled `rust-mingw` ships
+a self-contained linker but its `dlltool` needs the GNU assembler `as`, which is
+not bundled, so building `windows-sys` (via Tokio) failed with
+"dlltool: CreateProcess". Resolved **without any external install** by
+`scripts/dev-env.sh`: it points rustc at `llvm-dlltool` (the bundled `llvm-ar`
+invoked under that name, from the `llvm-tools` component — generates import
+libraries natively, no `as` needed) via `CARGO_ENCODED_RUSTFLAGS=-Cdlltool=…`
+and puts the self-contained linker on PATH. For CI / other machines, prefer
 installing either:
 - **MSVC** (recommended): VS Build Tools (C++ + Windows SDK), then
   `rustup toolchain install stable-x86_64-pc-windows-msvc` and set it default; or
@@ -142,7 +153,8 @@ installing either:
 - **Crate layout:** single `crates/engine` rather than the 7-crate split
   (`image-core/codecs/pipeline/...`). Avoided premature structure before the
   engine worked (rule #25). Split when a second consumer needs it.
-- **Dashboard, developer docs/SDK, auth/billing:** not started (later phases).
+- **Dashboard, auth/billing:** not started (later phases). Developer SDK +
+  `docs/api.md` are in place (Phase 7, partial).
 - **AVIF/HEIC/SVG/TIFF/GIF:** not implemented. AVIF encode needs native libaom
   (same linker prerequisite); others need more codecs. Both the engine and the
   SEO registries intentionally exclude them so nothing advertises them.
@@ -150,17 +162,16 @@ installing either:
   content. Adding another is a routing entry + a `PACKS` entry + a catalog.
 
 ## Exact next steps
-1. **Unblock Rust linking** (MSVC or MinGW), then `cargo run -p imageforge-api`,
-   hit `/health/live` and `POST /v1/convert` with a real PNG, and add API-level
-   integration tests (Phase 1 acceptance for the API).
-2. Add a language switcher UI and shared layout/nav/footer across locales.
-3. Add **AVIF** (needs native libaom) once the toolchain is fixed; extend both
-   registries and generate the TS registry from the Rust one to prevent drift.
-4. Async path (Phase 5): Postgres migrations, R2 adapter (+ MinIO local),
-   Redis Streams, worker, job lifecycle.
-5. Add Playwright E2E + React Testing Library component tests; CI (fmt, clippy,
-   cargo test, tsc, turbo build, vitest).
-6. Developer docs + TypeScript SDK (Phase 7) once the API runs.
+1. Wire the frontend's server-side fallback to call the API (`/v1/convert`) via
+   `NEXT_PUBLIC_API_URL` for formats/sizes the browser path cannot handle.
+2. Async path (Phase 5): Postgres migrations, R2 adapter (+ MinIO local),
+   Redis Streams, worker, job lifecycle, `/v1/jobs`.
+3. API hardening: per-IP rate limit, request-id middleware/tracing, CORS
+   allowlist, API keys + usage (Phase 7 auth).
+4. Add **AVIF** (needs native libaom); extend both registries and generate the
+   TS registry from the Rust one to prevent drift.
+5. CI (GitHub Actions): fmt, clippy, cargo test, tsc, turbo build, vitest.
+6. Playwright E2E + React Testing Library component tests.
 
 ## Architectural decisions
 - Engine is HTTP-independent (principle #6); API depends on engine only.

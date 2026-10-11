@@ -3,10 +3,15 @@
 ## Prerequisites
 - Node.js 22+ and npm 10+ (verified: Node 22.16, npm 10.9).
 - Rust stable (verified: 1.98.1).
-  - **Windows linker:** the engine builds on any toolchain, but the HTTP API
-    (Tokio → `windows-sys`) needs a native linker. Use the **MSVC** toolchain
-    (`rustup default stable-x86_64-pc-windows-msvc`, with VS Build Tools: C++
-    build tools + Windows SDK) or install **MinGW-w64** on PATH.
+  - **Windows linker (x86_64-pc-windows-gnu):** the engine builds on any
+    toolchain; the HTTP API (Tokio → `windows-sys`) needs a working `dlltool`.
+    rustup's bundled `rust-mingw` ships a self-contained linker but no GNU `as`,
+    so its `dlltool` fails. Work around it with no extra install by sourcing
+    [`scripts/dev-env.sh`](../scripts/dev-env.sh), which points rustc at
+    `llvm-dlltool` (from the bundled `llvm-tools`) and puts the self-contained
+    linker on PATH. For CI / reproducible builds, prefer the **MSVC** toolchain
+    (`rustup default stable-x86_64-pc-windows-msvc` + VS Build Tools) or a full
+    **MinGW-w64**.
 
 ## Frontend (pnpm + Turborepo, from repo root)
 pnpm is pinned via `packageManager`. If `pnpm` is not on PATH, enable it with
@@ -25,14 +30,18 @@ Locales: en/fr/es/de/pt/it. Example URLs: `/en/convert/png-to-webp`,
 Worker — no backend required.
 
 ## Rust workspace (repo root)
+On Windows, source the linker workaround once per shell first:
 ```bash
-cargo test -p imageforge-engine       # engine unit + integration tests
+source scripts/dev-env.sh             # windows-gnu dlltool workaround
+```
+Then:
+```bash
+cargo test --workspace                # engine (15) + API (6) tests
 cargo clippy --workspace -- -D warnings
 cargo fmt --all --check
-cargo check --workspace               # type-checks the API without linking
 ```
 
-### Running the API (requires the native linker above)
+### Running the API
 ```bash
 cargo run -p imageforge-api           # binds PORT (default 8080)
 # then, in another shell:
