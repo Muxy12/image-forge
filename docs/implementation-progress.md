@@ -9,8 +9,11 @@ conversion) MVP done and verified end-to-end. Tooling on **pnpm + Turborepo**.
 **i18n (next-intl, en/fr/es/de/pt/it)** and **Phase 6 SEO** landing pages done
 and verified in a real browser. The **Rust toolchain is unblocked** and the
 **HTTP API is built, tested (8 integration tests), and verified live over
-HTTP**. A typed **TypeScript SDK** (Phase 7, partial) is in place. Everything
-marked ✅ was executed and observed.
+HTTP**. A typed **TypeScript SDK** (Phase 7, partial) is in place. The
+**Phase 5 async backend** (job domain, Postgres, Redis Streams, R2 storage,
+worker) is implemented and unit-tested offline; live wiring awaits cloud
+credentials (see the Phase 5 section). Everything marked ✅ was executed and
+observed.
 
 ## Monorepo tooling ✅
 - **pnpm workspaces** (`pnpm-workspace.yaml`: `apps/*`, `packages/*`) +
@@ -114,6 +117,51 @@ Thin Axum layer over the engine:
   unknown-format, CORS allow-origin, and `X-Content-Type-Options: nosniff`.
   `cargo test -p imageforge-api` → **8 passed**.
 
+## Phase 5 async path — backend built & unit-tested; live wiring pending
+
+All the async-processing building blocks exist, compile, lint clean, and are
+unit-tested offline. What is NOT yet done: the API's async job endpoints and the
+live end-to-end run (needs cloud credentials + a runnable full-stack binary).
+
+- `crates/job-queue`: job lifecycle state machine + retry/backoff (7 tests).
+- `crates/storage`: `ObjectStore` trait, `MemoryStore`, and `S3Store` (R2/MinIO
+  via rust-s3, native-tls) + key generation (3 tests; S3 live-exercised later).
+- `crates/database`: sqlx Postgres — pool, embedded migrations, uploads, jobs,
+  transactional outbox (3 tests; Postgres integration test self-skips offline).
+- `crates/redis-queue`: Redis Streams queue — group, enqueue, read, ack,
+  reclaim (1 test; self-skips offline).
+- `crates/worker-core`: the conversion step over `ObjectStore` (3 tests: real
+  PNG→WebP through an in-memory store).
+- `services/worker`: orchestration loop (outbox relay → consume → convert →
+  advance lifecycle with retry/dead-letter → ack). Compiles; see the toolchain
+  limitation below.
+- `migrations/0001_init.sql`, `docker-compose.yml` (Postgres/Redis/MinIO), root
+  `.env.example`. The user opted for **cloud** backends (Neon + Upstash +
+  Cloudflare R2); credentials pending.
+
+### Toolchain limitation discovered (local only)
+A binary that links the whole cloud-TLS set (sqlx + redis + rust-s3/native-tls)
+**faults at startup** (STATUS_ACCESS_VIOLATION) under the local
+`x86_64-pc-windows-gnu` toolchain + the llvm-dlltool workaround — each dependency
+works in isolation, but the combined import-library thunks are miscompiled
+without a real C toolchain. This is a *local* limitation, not a code defect: on
+Linux (CI, Fly.io) the same code links and runs normally. Consequences:
+- `services/worker` has `test = false` (its harness would crash); its logic is
+  tested via `worker-core`.
+- The API's async endpoints are deliberately **not** merged into `services/api`
+  yet, because doing so would make the API binary link the same set and crash
+  locally, breaking the currently-green sync API + its 8 tests.
+
+### To finish Phase 5 (needs user action)
+1. Provide `DATABASE_URL` (Neon), `REDIS_URL` (Upstash), and R2_* (Cloudflare) —
+   placed in a local `.env` (git-ignored). Then the DB/Redis integration tests
+   run for real and the worker can process end-to-end.
+2. For the full-stack binary to run locally, install a real toolchain (MSVC
+   Build Tools, or a full MinGW-w64 with gcc/as). Otherwise do the end-to-end
+   verification in CI / on Fly.io (Linux), where it already builds.
+3. Then add the API async endpoints: `POST /v1/uploads` (presign), `POST
+   /v1/jobs`, `GET /v1/jobs/{id}`, `GET /v1/jobs/{id}/download`.
+
 ## CI (Phase 8, partial)
 - `.github/workflows/ci.yml`: a `rust` job (fmt, clippy `-D warnings`, test on
   `ubuntu-latest` — Linux uses the system linker, so no Windows-gnu workaround
@@ -133,7 +181,7 @@ Thin Axum layer over the engine:
 
 ### Rust — repo root
 First `source scripts/dev-env.sh` (Windows linker workaround), then:
-- `cargo test --workspace` ✅ (**23 tests**: engine 15 + API 8) ·
+- `cargo test --workspace` ✅ (**40 tests**: engine 15, API 8, job-queue 7, storage 3, database 3, redis-queue 1, worker-core 3) ·
   `cargo clippy --workspace -- -D warnings` ✅ · `cargo fmt --all --check` ✅ ·
   `cargo build -p imageforge-api` / `cargo run -p imageforge-api` ✅
 
