@@ -36,5 +36,7 @@ export PATH="$_sc:$PATH"
 # Use CARGO_ENCODED_RUSTFLAGS (split only on \x1f) so a dlltool path containing
 # spaces — e.g. a repo under "Projet Claude Code" — is passed as one argument.
 export CARGO_ENCODED_RUSTFLAGS="-Cdlltool=$_shimdir/llvm-dlltool.exe"
+# Keep the debug `target/` dir small (line-table backtraces, no full debuginfo).
+export CARGO_PROFILE_DEV_DEBUG="${CARGO_PROFILE_DEV_DEBUG:-line-tables-only}"
 
 echo "dev-env: windows-gnu linker ready (dlltool=llvm-dlltool, self-contained on PATH)"

@@ -1,0 +1,17 @@
+[package]
+name = "imageforge-storage"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+description = "ImageForge object storage abstraction (R2/S3) with an in-memory impl."
+
+[dependencies]
+async-trait = "0.1"
+bytes = "1"
+thiserror.workspace = true
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt"] }
