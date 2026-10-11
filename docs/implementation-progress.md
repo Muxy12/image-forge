@@ -114,6 +114,13 @@ Thin Axum layer over the engine:
   unknown-format, CORS allow-origin, and `X-Content-Type-Options: nosniff`.
   `cargo test -p imageforge-api` → **8 passed**.
 
+## CI (Phase 8, partial)
+- `.github/workflows/ci.yml`: a `rust` job (fmt, clippy `-D warnings`, test on
+  `ubuntu-latest` — Linux uses the system linker, so no Windows-gnu workaround
+  is needed) and a `web` job (pnpm install, typecheck, test, build). Not yet
+  run on a remote (no GitHub remote configured); the steps mirror the locally
+  green commands below.
+
 ## Verified commands
 
 ### Frontend — `apps/web/`
