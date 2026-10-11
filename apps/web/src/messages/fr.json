@@ -40,6 +40,13 @@
     "errFailed": "La conversion a échoué.",
     "unavailable": "Votre navigateur ne prend pas en charge la conversion locale (OffscreenCanvas / Web Workers). Un chemin côté serveur est prévu en secours."
   },
+  "nav": {
+    "home": "Accueil",
+    "conversions": "Conversions",
+    "skipToContent": "Aller au contenu",
+    "language": "Langue",
+    "rights": "Tous droits réservés."
+  },
   "convertPage": {
     "breadcrumbHome": "Accueil",
     "breadcrumbConvert": "Convertir",

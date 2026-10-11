@@ -210,6 +210,20 @@ export function pageBySlug(slug: string, locale: Locale): ConversionPage | undef
   return CONVERSION_PAGES.find((p) => p.slug[locale] === slug);
 }
 
+/**
+ * The equivalent slug in `target` locale for a page identified by its slug in
+ * `active` locale, or null if the slug is unknown. Used by the language
+ * switcher to map e.g. `png-to-webp` (en) → `png-en-webp` (fr).
+ */
+export function counterpartSlug(
+  slug: string,
+  active: Locale,
+  target: Locale,
+): string | null {
+  const page = pageBySlug(slug, active);
+  return page ? page.slug[target] : null;
+}
+
 /** Up to `limit` other published pages sharing a format with the given one. */
 export function relatedPages(page: ConversionPage, limit = 4): ConversionPage[] {
   return publishedPages()

@@ -37,7 +37,19 @@ and verified in a real browser. Everything marked ✅ was executed and observed.
   hreflang correct in served HTML (1 canonical, 3 hreflang); sitemap lists only
   the 14 published URLs; `/fr/convertir/png-en-webp` 200 and fully French;
   `/en/convert/png-to-avif` → 404 (unsupported pair is not generated).
-- `pnpm run build` → 19 static pages; `typecheck` and 12 Vitest tests pass.
+- `pnpm run build` → 19 static pages; `typecheck` and 18 Vitest tests pass.
+
+## Shared layout + language switcher ✅
+- `components/layout/Header.tsx` (brand + switcher, sticky), `Footer.tsx`
+  (localized conversion links + copyright), `LanguageSwitcher.tsx` (client).
+  Wired into `app/[locale]/layout.tsx` with a skip-to-content link and a
+  full-height flex wrapper; pages provide `<main id="content">`.
+- The switcher preserves the current route when changing locale, including the
+  localized slug on conversion pages (`counterpartSlug` maps `png-to-webp` ↔
+  `png-en-webp`; covered by `lib/seo/conversions.test.ts`).
+- **Verified in the app:** on `/en/convert/png-to-webp` the FR control links to
+  `/fr/convertir/png-en-webp` and navigating there renders the French page
+  (lang=fr, FR active); on the home page the controls are `/en` ↔ `/fr`.
 
 ## What works (verified)
 

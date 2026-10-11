@@ -40,6 +40,13 @@
     "errFailed": "Conversion failed.",
     "unavailable": "Your browser does not support local image conversion (OffscreenCanvas / Web Workers). A server-side path is planned as a fallback."
   },
+  "nav": {
+    "home": "Home",
+    "conversions": "Conversions",
+    "skipToContent": "Skip to content",
+    "language": "Language",
+    "rights": "All rights reserved."
+  },
   "convertPage": {
     "breadcrumbHome": "Home",
     "breadcrumbConvert": "Convert",

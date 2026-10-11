@@ -13,7 +13,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
   const pages = publishedPages();
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-12 px-4 py-12 sm:py-16">
+    <main id="content" className="mx-auto flex max-w-3xl flex-col gap-12 px-4 py-12 sm:py-16">
       <header className="flex flex-col gap-3">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t("heroTitle")}</h1>
         <p className="max-w-2xl text-base text-foreground/70 sm:text-lg">{t("heroSubtitle")}</p>
@@ -53,9 +53,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </div>
       </section>
 
-      <footer className="border-t border-black/10 pt-6 text-sm text-foreground/50 dark:border-white/10">
-        <p>{t("footer")}</p>
-      </footer>
+      <p className="text-sm text-foreground/50">{t("footer")}</p>
     </main>
   );
 }
