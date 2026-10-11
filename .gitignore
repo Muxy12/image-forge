@@ -11,6 +11,9 @@ out
 *.tsbuildinfo
 next-env.d.ts
 
+# Turborepo
+.turbo
+
 # Environment / secrets
 .env
 .env.local

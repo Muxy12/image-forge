@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -28,11 +29,12 @@ interface Source {
 
 type Status = "idle" | "ready" | "converting" | "done" | "error";
 
-export function Converter() {
+export function Converter({ initialTarget = "webp" }: { initialTarget?: ImageFormatToken }) {
+  const t = useTranslations("converter");
   const [available, setAvailable] = useState<boolean | null>(null);
   const [encodable, setEncodable] = useState<Set<ImageFormatToken>>(new Set());
   const [source, setSource] = useState<Source | null>(null);
-  const [target, setTarget] = useState<ImageFormatToken>("webp");
+  const [target, setTarget] = useState<ImageFormatToken>(initialTarget);
   const [quality, setQuality] = useState(82);
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState<string>("");
@@ -74,7 +76,7 @@ export function Converter() {
       if (!format) {
         setSource(null);
         setStatus("error");
-        setMessage("Unsupported file. Use a PNG, JPG, or WebP image.");
+        setMessage(t("errUnsupportedFile"));
         return;
       }
 
@@ -98,10 +100,10 @@ export function Converter() {
         setStatus("ready");
       } catch {
         setStatus("error");
-        setMessage("That image could not be read by your browser.");
+        setMessage(t("errUnreadable"));
       }
     },
-    [],
+    [t],
   );
 
   const onDrop = useCallback(
@@ -118,7 +120,7 @@ export function Converter() {
     if (!source) return;
     if (target === source.format) {
       setStatus("error");
-      setMessage("Pick a target format different from the source.");
+      setMessage(t("errPickDifferent"));
       return;
     }
     setStatus("converting");
@@ -132,9 +134,9 @@ export function Converter() {
       setStatus("done");
     } catch (err) {
       setStatus("error");
-      setMessage(err instanceof Error ? err.message : "Conversion failed.");
+      setMessage(err instanceof Error ? err.message : t("errFailed"));
     }
-  }, [source, target, quality]);
+  }, [source, target, quality, t]);
 
   const reset = useCallback(() => {
     setSource((prev) => {
@@ -153,8 +155,7 @@ export function Converter() {
   if (available === false) {
     return (
       <div className="rounded-xl border border-black/10 bg-black/[0.02] p-6 text-sm dark:border-white/10 dark:bg-white/[0.03]">
-        Your browser does not support local image conversion (OffscreenCanvas /
-        Web Workers). A server-side path is planned as a fallback.
+        {t("unavailable")}
       </div>
     );
   }
@@ -180,15 +181,15 @@ export function Converter() {
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        aria-label="Choose an image, or drag and drop one here"
+        aria-label={t("dropTitle")}
         className={`flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-10 text-center transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${
           dragging
             ? "border-indigo-500 bg-indigo-500/5"
             : "border-black/15 hover:border-black/30 dark:border-white/15 dark:hover:border-white/30"
         }`}
       >
-        <span className="text-sm font-medium">Drop an image or click to choose</span>
-        <span className="text-xs text-foreground/50">PNG, JPG, or WebP · processed locally</span>
+        <span className="text-sm font-medium">{t("dropTitle")}</span>
+        <span className="text-xs text-foreground/50">{t("dropHint")}</span>
       </button>
       <input
         ref={inputRef}
@@ -212,30 +213,30 @@ export function Converter() {
           />
           <div className="flex flex-col gap-4">
             <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-              <dt className="text-foreground/50">Source</dt>
+              <dt className="text-foreground/50">{t("source")}</dt>
               <dd className="text-right font-medium">{FORMATS[source.format].label}</dd>
-              <dt className="text-foreground/50">Dimensions</dt>
+              <dt className="text-foreground/50">{t("dimensions")}</dt>
               <dd className="text-right font-medium">
                 {source.width} × {source.height}
               </dd>
-              <dt className="text-foreground/50">Size</dt>
+              <dt className="text-foreground/50">{t("size")}</dt>
               <dd className="text-right font-medium">{formatBytes(source.size)}</dd>
             </dl>
 
             <div className="flex flex-wrap items-end gap-4">
               <label className="flex flex-col gap-1 text-sm">
-                <span className="text-foreground/60">Convert to</span>
+                <span className="text-foreground/60">{t("convertTo")}</span>
                 <select
                   value={target}
                   onChange={(e) => setTarget(e.target.value as ImageFormatToken)}
                   className="rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-indigo-500 dark:border-white/15"
                 >
-                  {OUTPUT_FORMATS.filter((t) => t !== source.format).map((t) => {
-                    const disabled = !encodable.has(t);
+                  {OUTPUT_FORMATS.filter((fmt) => fmt !== source.format).map((fmt) => {
+                    const disabled = !encodable.has(fmt);
                     return (
-                      <option key={t} value={t} disabled={disabled}>
-                        {FORMATS[t].label}
-                        {disabled ? " (unsupported here)" : ""}
+                      <option key={fmt} value={fmt} disabled={disabled}>
+                        {FORMATS[fmt].label}
+                        {disabled ? ` ${t("unsupportedOption")}` : ""}
                       </option>
                     );
                   })}
@@ -244,7 +245,7 @@ export function Converter() {
 
               <label className="flex flex-1 flex-col gap-1 text-sm">
                 <span className="text-foreground/60">
-                  Quality {targetMeta.lossy ? quality : "— (lossless)"}
+                  {t("quality")} {targetMeta.lossy ? quality : `— (${t("lossless")})`}
                 </span>
                 <input
                   type="range"
@@ -266,14 +267,14 @@ export function Converter() {
                 disabled={status === "converting" || !encodable.has(target)}
                 className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50"
               >
-                {status === "converting" ? "Converting…" : "Convert"}
+                {status === "converting" ? t("converting") : t("convert")}
               </button>
               <button
                 type="button"
                 onClick={reset}
                 className="rounded-lg border border-black/15 px-4 py-2 text-sm font-medium transition-colors hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/[0.05]"
               >
-                Reset
+                {t("reset")}
               </button>
             </div>
           </div>
@@ -290,15 +291,15 @@ export function Converter() {
         <div className="mt-2 rounded-xl border border-black/10 bg-black/[0.02] p-4 dark:border-white/10 dark:bg-white/[0.03]">
           <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-4">
             <div>
-              <dt className="text-foreground/50">Output</dt>
+              <dt className="text-foreground/50">{t("output")}</dt>
               <dd className="font-medium">{FORMATS[target].label}</dd>
             </div>
             <div>
-              <dt className="text-foreground/50">Size</dt>
+              <dt className="text-foreground/50">{t("size")}</dt>
               <dd className="font-medium">{formatBytes(result.size)}</dd>
             </div>
             <div>
-              <dt className="text-foreground/50">Change</dt>
+              <dt className="text-foreground/50">{t("change")}</dt>
               <dd
                 className={`font-medium ${delta !== null && delta < 0 ? "text-green-600 dark:text-green-400" : ""}`}
               >
@@ -306,7 +307,7 @@ export function Converter() {
               </dd>
             </div>
             <div>
-              <dt className="text-foreground/50">Time</dt>
+              <dt className="text-foreground/50">{t("time")}</dt>
               <dd className="font-medium">{result.durationMs.toFixed(0)} ms</dd>
             </div>
           </dl>
@@ -315,7 +316,7 @@ export function Converter() {
             download={downloadName}
             className="mt-4 inline-flex rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
           >
-            Download {downloadName}
+            {t("download", { name: downloadName })}
           </a>
         </div>
       )}

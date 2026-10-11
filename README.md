@@ -11,16 +11,30 @@ and workloads the browser cannot handle. Heavy processing stays off Vercel.
 ```
 ImageForge/
 ├── apps/
-│   └── web/                 # Next.js frontend (TypeScript, Tailwind, shadcn/ui)
+│   └── web/                 # Next.js frontend (TS, Tailwind, next-intl en/fr)
+│       └── src/
+│           ├── app/[locale]/         # localized routes (home, convert/[slug])
+│           ├── components/converter/ # browser-side converter UI
+│           ├── lib/conversion/       # capability registry + worker client
+│           ├── lib/seo/              # SEO conversion registry
+│           ├── workers/              # Web Worker (OffscreenCanvas)
+│           ├── i18n/ · messages/     # routing + translations
+│           ├── app/sitemap.ts · app/robots.ts
+│           └── middleware.ts
 ├── services/
 │   └── api/                 # Rust HTTP service (Axum, Tokio) — thin HTTP layer
 ├── crates/
 │   └── engine/              # Rust conversion engine — HTTP-independent library
-├── docs/
-│   └── implementation-progress.md
+├── docs/                    # implementation-progress.md, local-development.md
 ├── Cargo.toml               # Rust workspace manifest
+├── pnpm-workspace.yaml      # pnpm workspaces
+├── turbo.json               # Turborepo task graph
+├── package.json             # root scripts (turbo)
 └── CLAUDE.md                # Project instructions
 ```
+
+Tooling: **pnpm + Turborepo** for JS, a **Cargo workspace** for Rust. See
+[`docs/local-development.md`](docs/local-development.md) for commands.
 
 ## Architecture
 

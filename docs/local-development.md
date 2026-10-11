@@ -8,16 +8,19 @@
     (`rustup default stable-x86_64-pc-windows-msvc`, with VS Build Tools: C++
     build tools + Windows SDK) or install **MinGW-w64** on PATH.
 
-## Frontend (`apps/web/`)
+## Frontend (pnpm + Turborepo, from repo root)
+pnpm is pinned via `packageManager`. If `pnpm` is not on PATH, enable it with
+`corepack enable pnpm` (or `npm i -g pnpm@9.15.4`).
 ```bash
-cd apps/web
-npm install
-npm run dev        # http://localhost:3000
-npm run typecheck  # tsc --noEmit
-npm run test       # Vitest unit tests
-npm run build      # production build
+pnpm install
+pnpm run dev        # http://localhost:3000 (turbo → next dev)
+pnpm run typecheck  # tsc --noEmit
+pnpm run test       # Vitest unit tests
+pnpm run build      # production build (19 static pages)
 ```
-PNG/JPG/WebP conversions run locally in a Web Worker — no backend required.
+Localized URLs: `/en`, `/fr`, `/en/convert/png-to-webp`,
+`/fr/convertir/png-en-webp`. PNG/JPG/WebP conversions run locally in a Web
+Worker — no backend required.
 
 ## Rust workspace (repo root)
 ```bash

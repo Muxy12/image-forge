@@ -1,0 +1,53 @@
+{
+  "site": {
+    "name": "ImageForge",
+    "tagline": "Fast, private image conversion",
+    "description": "Convert images between PNG, JPG, and WebP in your browser. Fast, free, and private."
+  },
+  "home": {
+    "heroTitle": "Convert images instantly. Fast, free, and private.",
+    "heroSubtitle": "Convert between PNG, JPG, and WebP right in your browser. No upload, no account, no waiting.",
+    "popularTitle": "Popular conversions",
+    "benefitsTitle": "Why ImageForge",
+    "benefitPrivateTitle": "Private by default",
+    "benefitPrivateBody": "PNG, JPG, and WebP conversions run entirely in your browser. Your files are never uploaded.",
+    "benefitFastTitle": "Fast",
+    "benefitFastBody": "Conversions happen locally with no network round-trip, off the main thread so the page stays responsive.",
+    "benefitDevTitle": "Developer-first",
+    "benefitDevBody": "A versioned REST API and conversion engine power the same conversions you see here.",
+    "footer": "Browser-side conversion for PNG, JPG, and WebP. AVIF and a server-side path for large and batch jobs are in progress."
+  },
+  "converter": {
+    "dropTitle": "Drop an image or click to choose",
+    "dropHint": "PNG, JPG, or WebP · processed locally",
+    "source": "Source",
+    "dimensions": "Dimensions",
+    "size": "Size",
+    "convertTo": "Convert to",
+    "quality": "Quality",
+    "lossless": "lossless",
+    "convert": "Convert",
+    "converting": "Converting…",
+    "reset": "Reset",
+    "output": "Output",
+    "change": "Change",
+    "time": "Time",
+    "download": "Download {name}",
+    "unsupportedOption": "(unsupported here)",
+    "errUnsupportedFile": "Unsupported file. Use a PNG, JPG, or WebP image.",
+    "errUnreadable": "That image could not be read by your browser.",
+    "errPickDifferent": "Pick a target format different from the source.",
+    "errFailed": "Conversion failed.",
+    "unavailable": "Your browser does not support local image conversion (OffscreenCanvas / Web Workers). A server-side path is planned as a fallback."
+  },
+  "convertPage": {
+    "breadcrumbHome": "Home",
+    "breadcrumbConvert": "Convert",
+    "howToTitle": "How to convert",
+    "prosTitle": "Advantages",
+    "consTitle": "Things to know",
+    "faqTitle": "Frequently asked questions",
+    "relatedTitle": "Related conversions",
+    "processedLocally": "Converted locally in your browser — no upload."
+  }
+}

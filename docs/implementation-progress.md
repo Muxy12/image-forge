@@ -5,8 +5,39 @@ _Last updated: 2026-10-11_
 ## Current phase
 
 Phase 1 (foundation) done. Phase 2 (engine) core done. Phase 3 (browser
-conversion) MVP done and verified end-to-end in a real browser. Everything
-below marked ✅ was executed and observed this session.
+conversion) MVP done and verified end-to-end. Tooling migrated to **pnpm +
+Turborepo**. **i18n (next-intl, en/fr)** and **Phase 6 SEO** landing pages done
+and verified in a real browser. Everything marked ✅ was executed and observed.
+
+## Monorepo tooling ✅
+- **pnpm workspaces** (`pnpm-workspace.yaml`: `apps/*`, `packages/*`) +
+  **Turborepo** (`turbo.json`, root `package.json`). `pnpm install`,
+  `pnpm run build`/`test`/`typecheck` all drive the web app through turbo.
+- pnpm is provided via the user npm global bin (corepack could not write to
+  `C:\Program Files\nodejs`); `packageManager` is pinned to `pnpm@9.15.4`.
+
+## i18n ✅ (next-intl 4)
+- Locales en/fr, always-prefixed URLs, localized pathnames:
+  `/en/convert/[slug]` ↔ `/fr/convertir/[slug]`, with per-conversion localized
+  slugs (`png-to-webp` ↔ `png-en-webp`).
+- `src/i18n/{routing,navigation,request}.ts`, `src/middleware.ts`,
+  `messages/{en,fr}.json`, `app/[locale]/layout.tsx`. Converter and all chrome
+  are translated; verified no en/fr mixing (FR page is fully French).
+
+## SEO landing pages ✅ (Phase 6)
+- SEO registry `lib/seo/conversions.ts` is the source of truth, gated to the
+  engine's supported pairs; `status` controls publish/noindex/draft/unsupported.
+- `app/[locale]/convert/[slug]/page.tsx`: `generateStaticParams` (published
+  only, `dynamicParams = false`), `generateMetadata` (unique title/description,
+  canonical, hreflang en/fr/x-default, Open Graph), H1, format-specific intro,
+  how-to, pros/cons, FAQ, related links, embedded converter, BreadcrumbList +
+  FAQPage JSON-LD, breadcrumb nav.
+- `app/sitemap.ts` (14 published URLs only), `app/robots.ts`.
+- **Verified in the running app:** `/` → `/en` redirect; titles/canonical/
+  hreflang correct in served HTML (1 canonical, 3 hreflang); sitemap lists only
+  the 14 published URLs; `/fr/convertir/png-en-webp` 200 and fully French;
+  `/en/convert/png-to-avif` → 404 (unsupported pair is not generated).
+- `pnpm run build` → 19 static pages; `typecheck` and 12 Vitest tests pass.
 
 ## What works (verified)
 
@@ -54,6 +85,10 @@ Thin Axum layer over the engine:
 - `npm install` · `npm run typecheck` ✅ · `npm run test` ✅ · `npm run build` ✅
 - `npm run dev` — dev server on :3000 (verified via the app preview).
 
+### Monorepo (repo root)
+- `pnpm install` ✅ · `pnpm run build` ✅ (turbo) · `pnpm run test` ✅ ·
+  `pnpm run typecheck` ✅
+
 ### Rust — repo root
 - `cargo test -p imageforge-engine` ✅ · `cargo clippy --workspace` ✅ ·
   `cargo fmt --all --check` ✅ · `cargo check --workspace` ✅
@@ -76,30 +111,28 @@ installing either:
   only fix is Next 16 (major) — deferred, not forced.
 
 ## Deviations from the master prompt (deliberate, this session)
-- **Package manager:** npm, not pnpm/Turborepo. Kept to preserve a verified
-  build; migrating to pnpm workspaces is a clean follow-up.
 - **Crate layout:** single `crates/engine` rather than the 7-crate split
   (`image-core/codecs/pipeline/...`). Avoided premature structure before the
   engine worked (rule #25). Split when a second consumer needs it.
-- **i18n / `[locale]` routing, SEO pages, dashboard:** not started (later phases).
+- **Dashboard, developer docs/SDK, auth/billing:** not started (later phases).
 - **AVIF/HEIC/SVG/TIFF/GIF:** not implemented. AVIF encode needs native libaom
-  (same linker prerequisite); others need more codecs. Registry intentionally
-  excludes them so nothing advertises them.
+  (same linker prerequisite); others need more codecs. Both the engine and the
+  SEO registries intentionally exclude them so nothing advertises them.
+- **Additional locales (es/de/pt/it):** architecture is ready; only en/fr have
+  message catalogs.
 
 ## Exact next steps
 1. **Unblock Rust linking** (MSVC or MinGW), then `cargo run -p imageforge-api`,
    hit `/health/live` and `POST /v1/convert` with a real PNG, and add API-level
    integration tests (Phase 1 acceptance for the API).
-2. Migrate frontend to **pnpm + Turborepo** workspaces (mandated stack).
-3. Add **next-intl** `[locale]` routing (en, fr) and move the converter under a
-   localized route.
-4. Build the **SEO conversion pages** from a shared registry (only
-   server-ready, tested pairs enter the sitemap) — Phase 6.
-5. Add **AVIF** (needs native libaom) once the toolchain is fixed.
-6. Async path (Phase 5): Postgres migrations, R2 adapter (+ MinIO local),
+2. Add a language switcher UI and shared layout/nav/footer across locales.
+3. Add **AVIF** (needs native libaom) once the toolchain is fixed; extend both
+   registries and generate the TS registry from the Rust one to prevent drift.
+4. Async path (Phase 5): Postgres migrations, R2 adapter (+ MinIO local),
    Redis Streams, worker, job lifecycle.
-7. Add Playwright E2E + React Testing Library component tests; CI (fmt, clippy,
-   cargo test, tsc, build, vitest).
+5. Add Playwright E2E + React Testing Library component tests; CI (fmt, clippy,
+   cargo test, tsc, turbo build, vitest).
+6. Developer docs + TypeScript SDK (Phase 7) once the API runs.
 
 ## Architectural decisions
 - Engine is HTTP-independent (principle #6); API depends on engine only.
