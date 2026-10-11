@@ -8,7 +8,7 @@ Phase 1 (foundation) done. Phase 2 (engine) core done. Phase 3 (browser
 conversion) MVP done and verified end-to-end. Tooling on **pnpm + Turborepo**.
 **i18n (next-intl, en/fr/es/de/pt/it)** and **Phase 6 SEO** landing pages done
 and verified in a real browser. The **Rust toolchain is unblocked** and the
-**HTTP API is built, tested (6 integration tests), and verified live over
+**HTTP API is built, tested (8 integration tests), and verified live over
 HTTP**. A typed **TypeScript SDK** (Phase 7, partial) is in place. Everything
 marked ✅ was executed and observed.
 
@@ -93,7 +93,7 @@ Thin Axum layer over the engine:
 - `POST /v1/convert` (multipart → engine; 25 MiB body limit; structured JSON
   errors with stable codes + request id).
 - **Toolchain unblocked** (see below): `cargo build`/`test`/`run` all work.
-  6 integration tests pass (`cargo test -p imageforge-api`).
+  8 integration tests pass (`cargo test -p imageforge-api`).
 - **Verified live over HTTP** (server on :8080): `/health/live` and
   `/health/ready` → ok; `/v1/conversions` lists the 6 pairs; `POST /v1/convert`
   PNG→WebP returned `image/webp` (RIFF/WEBP), PNG→JPG with resize returned
@@ -111,7 +111,8 @@ Thin Axum layer over the engine:
 - `services/api` has `#[tokio::test]` coverage via `tower::ServiceExt::oneshot`:
   health, `/v1/conversions`, real PNG→WebP multipart convert (asserts WebP
   signature + decoded dims), 415 unsupported, 400 missing-file, 400
-  unknown-format. `cargo test -p imageforge-api` → **6 passed**.
+  unknown-format, CORS allow-origin, and `X-Content-Type-Options: nosniff`.
+  `cargo test -p imageforge-api` → **8 passed**.
 
 ## Verified commands
 
@@ -125,7 +126,7 @@ Thin Axum layer over the engine:
 
 ### Rust — repo root
 First `source scripts/dev-env.sh` (Windows linker workaround), then:
-- `cargo test --workspace` ✅ (**21 tests**: engine 15 + API 6) ·
+- `cargo test --workspace` ✅ (**23 tests**: engine 15 + API 8) ·
   `cargo clippy --workspace -- -D warnings` ✅ · `cargo fmt --all --check` ✅ ·
   `cargo build -p imageforge-api` / `cargo run -p imageforge-api` ✅
 

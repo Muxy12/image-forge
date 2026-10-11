@@ -82,6 +82,15 @@ Consistent JSON envelope with a stable `code`, a human message, and a request id
 | 422  | `DECODE_FAILED`          | the input could not be decoded              |
 | 500  | `ENCODE_FAILED`          | the output could not be encoded             |
 
+## Security & CORS
+
+- CORS: origins are allowlisted via `CORS_ALLOWED_ORIGINS` (comma-separated;
+  defaults to `http://localhost:3000`). Allowed methods `GET, POST`; allowed
+  headers `Content-Type, Authorization`. Credentials are not enabled (the API
+  is token-based, not cookie-based).
+- Every response carries `X-Content-Type-Options: nosniff`.
+- Request body is capped at 25 MiB on `/v1/convert`.
+
 ## Not yet implemented
 
 Async jobs (`/v1/uploads`, `/v1/jobs`, `/v1/jobs/{id}`…), usage/API keys, and

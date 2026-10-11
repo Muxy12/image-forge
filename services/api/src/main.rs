@@ -7,6 +7,7 @@
 
 mod error;
 mod handlers;
+mod middleware;
 
 use std::net::SocketAddr;
 
@@ -58,6 +59,8 @@ fn router() -> Router {
         .route("/v1/conversions", get(handlers::conversions))
         .route("/v1/convert", post(handlers::convert))
         .layer(DefaultBodyLimit::max(MAX_SYNC_BODY_BYTES))
+        .layer(middleware::cors_layer())
+        .layer(middleware::nosniff_layer())
         .layer(TraceLayer::new_for_http())
 }
 
@@ -101,9 +104,7 @@ mod tests {
         push(&mut body, &format!("--{BOUNDARY}\r\n"));
         push(
             &mut body,
-            &format!(
-                "Content-Disposition: form-data; name=\"file\"; filename=\"{filename}\"\r\n"
-            ),
+            &format!("Content-Disposition: form-data; name=\"file\"; filename=\"{filename}\"\r\n"),
         );
         push(&mut body, "Content-Type: image/png\r\n\r\n");
         body.extend_from_slice(file);
@@ -138,7 +139,12 @@ mod tests {
     #[tokio::test]
     async fn health_live_ok() {
         let resp = router()
-            .oneshot(Request::builder().uri("/health/live").body(Body::empty()).unwrap())
+            .oneshot(
+                Request::builder()
+                    .uri("/health/live")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
             .await
             .unwrap();
         assert_eq!(resp.status(), StatusCode::OK);
@@ -150,7 +156,12 @@ mod tests {
     #[tokio::test]
     async fn conversions_lists_supported_pairs() {
         let resp = router()
-            .oneshot(Request::builder().uri("/v1/conversions").body(Body::empty()).unwrap())
+            .oneshot(
+                Request::builder()
+                    .uri("/v1/conversions")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
             .await
             .unwrap();
         assert_eq!(resp.status(), StatusCode::OK);
@@ -205,6 +216,43 @@ mod tests {
         let bytes = to_bytes(resp.into_body(), usize::MAX).await.unwrap();
         let json: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
         assert_eq!(json["error"]["code"], "MISSING_FILE");
+    }
+
+    #[tokio::test]
+    async fn cors_allows_the_configured_origin() {
+        let resp = router()
+            .oneshot(
+                Request::builder()
+                    .uri("/health/live")
+                    .header(header::ORIGIN, "http://localhost:3000")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            resp.headers()
+                .get(header::ACCESS_CONTROL_ALLOW_ORIGIN)
+                .unwrap(),
+            "http://localhost:3000"
+        );
+    }
+
+    #[tokio::test]
+    async fn responses_carry_nosniff() {
+        let resp = router()
+            .oneshot(
+                Request::builder()
+                    .uri("/health/live")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            resp.headers().get(header::X_CONTENT_TYPE_OPTIONS).unwrap(),
+            "nosniff"
+        );
     }
 
     #[tokio::test]
