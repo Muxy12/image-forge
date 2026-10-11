@@ -1,14 +1,25 @@
 //! ImageForge HTTP service.
 //!
-//! A thin Axum layer that will expose the conversion engine over HTTP. It owns
-//! routing, request limits, tracing, and (later) queueing to Redis Streams and
-//! storage on R2. All image work is delegated to `imageforge-engine`, which
-//! knows nothing about HTTP.
+//! A thin Axum layer over `imageforge-engine`. It owns routing, body-size
+//! limits, tracing, and (later) async job creation backed by Postgres, Redis
+//! Streams, and R2. All image work is delegated to the engine, which knows
+//! nothing about HTTP.
+
+mod error;
+mod handlers;
 
 use std::net::SocketAddr;
 
-use axum::{routing::get, Json, Router};
+use axum::{
+    extract::DefaultBodyLimit,
+    routing::{get, post},
+    Router,
+};
 use tower_http::trace::TraceLayer;
+
+/// Maximum accepted request body for the synchronous convert endpoint.
+/// Larger inputs must use the async upload + job path (not yet implemented).
+const MAX_SYNC_BODY_BYTES: usize = 25 * 1024 * 1024; // 25 MiB
 
 #[tokio::main]
 async fn main() {
@@ -38,20 +49,16 @@ async fn main() {
         .expect("server error");
 }
 
-/// Build the application router. Kept separate so it can be exercised in tests.
+/// Build the application router. Separate so it can be exercised in tests.
 fn router() -> Router {
     Router::new()
-        .route("/health", get(health))
+        .route("/health/live", get(handlers::health_live))
+        .route("/health/ready", get(handlers::health_ready))
+        .route("/v1/formats", get(handlers::formats))
+        .route("/v1/conversions", get(handlers::conversions))
+        .route("/v1/convert", post(handlers::convert))
+        .layer(DefaultBodyLimit::max(MAX_SYNC_BODY_BYTES))
         .layer(TraceLayer::new_for_http())
-}
-
-/// Liveness probe. Returns the service name and version.
-async fn health() -> Json<serde_json::Value> {
-    Json(serde_json::json!({
-        "status": "ok",
-        "service": env!("CARGO_PKG_NAME"),
-        "version": env!("CARGO_PKG_VERSION"),
-    }))
 }
 
 async fn shutdown_signal() {

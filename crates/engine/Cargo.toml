@@ -9,3 +9,4 @@ description = "ImageForge image conversion engine — HTTP-independent."
 
 [dependencies]
 thiserror.workspace = true
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
