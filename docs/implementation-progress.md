@@ -93,6 +93,20 @@ Thin Axum layer over the engine:
   lint-clean). It is **not** build-run-verified here: see the toolchain
   prerequisite. No endpoint has been hit with a live request yet.
 
+## TypeScript SDK ✅ (Phase 7, partial)
+- `packages/sdk-typescript` (`@imageforge/sdk`): typed client mirroring the
+  live API — `convert`, `listConversions`, `listFormats`, `health`, structured
+  `ImageForgeError`, injectable `fetch`, optional bearer `apiKey` (not yet
+  enforced server-side). `typecheck` clean; **5 Vitest tests** pass.
+- `docs/api.md` documents only implemented endpoints and the error envelope.
+
+## API integration tests (compile-verified; run pending linker)
+- `services/api` has `#[tokio::test]` coverage via `tower::ServiceExt::oneshot`:
+  health, `/v1/conversions`, real PNG→WebP multipart convert (asserts WebP
+  signature + decoded dims), 415 unsupported, 400 missing-file, 400
+  unknown-format. `cargo check -p imageforge-api --tests` passes; they run once
+  the toolchain links (below).
+
 ## Verified commands
 
 ### Frontend — `apps/web/`

@@ -315,9 +315,11 @@ name = "imageforge-api"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "image",
  "imageforge-engine",
  "serde_json",
  "tokio",
+ "tower",
  "tower-http",
  "tracing",
  "tracing-subscriber",
