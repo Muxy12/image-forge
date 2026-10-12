@@ -50,6 +50,10 @@ const PAIRS: ReadonlyArray<[ImageFormatToken, ImageFormatToken]> = [
   ["png", "jpeg"],
   ["jpeg", "webp"],
   ["webp", "jpeg"],
+  // AVIF output (encode-only in the engine; runs via the server fallback).
+  ["png", "avif"],
+  ["jpeg", "avif"],
+  ["webp", "avif"],
 ];
 
 function slugToken(t: ImageFormatToken): string {

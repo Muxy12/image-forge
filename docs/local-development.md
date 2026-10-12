@@ -21,7 +21,7 @@ pnpm install
 pnpm run dev        # http://localhost:3000 (turbo → next dev)
 pnpm run typecheck  # tsc --noEmit
 pnpm run test       # Vitest unit tests
-pnpm run build      # production build (47 static pages)
+pnpm run build      # production build (65 static pages)
 ```
 Locales: en/fr/es/de/pt/it. Example URLs: `/en/convert/png-to-webp`,
 `/fr/convertir/png-en-webp`, `/es/convertir/png-a-webp`,

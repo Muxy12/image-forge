@@ -40,12 +40,17 @@ observed.
   canonical, hreflang en/fr/x-default, Open Graph), H1, format-specific intro,
   how-to, pros/cons, FAQ, related links, embedded converter, BreadcrumbList +
   FAQPage JSON-LD, breadcrumb nav.
-- `app/sitemap.ts` (42 published URLs only), `app/robots.ts`.
+- Covers the 6 PNG/JPG/WebP cross pairs **plus 3 X→AVIF pairs** (9 conversions
+  × 6 locales = 54 pages); AVIF-output pages convert via the server fallback.
+- `app/sitemap.ts` (60 published URLs only), `app/robots.ts`.
 - **Verified in the running app:** `/` → `/en` redirect; titles/canonical/
   hreflang correct in served HTML (1 canonical, 3 hreflang); sitemap lists only
-  the 42 published URLs; `/fr/convertir/png-en-webp` 200 and fully French;
+  the 60 published URLs; `/fr/convertir/png-en-webp` 200 and fully French;
   `/en/convert/png-to-avif` → 404 (unsupported pair is not generated).
-- `pnpm run build` → 47 static pages; `typecheck` and 21 Vitest tests pass.
+- `pnpm run build` → 65 static pages; `typecheck` and 22 Vitest tests pass.
+- **Verified:** the AVIF SEO pages render per locale with correct titles/H1,
+  canonical + 7 hreflang, and a lossy-format mention; `png-to-heic` (not a real
+  conversion) still 404s.
 
 ## Server-side fallback (frontend) ✅
 - `lib/conversion/server.ts`: `chooseMode(browserCanEncode, serverAvailable)`
