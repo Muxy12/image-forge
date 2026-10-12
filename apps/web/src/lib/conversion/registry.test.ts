@@ -50,8 +50,12 @@ describe("allConversions", () => {
     expect(convs.every((c) => c.from !== c.to)).toBe(true);
   });
 
-  it("covers the 6 PNG/JPEG/WebP cross pairs", () => {
-    expect(allConversions()).toHaveLength(6);
+  it("spans input→output cross pairs (incl. AVIF output)", () => {
+    const convs = allConversions();
+    // 3 inputs × 4 outputs − 3 same-format = 9.
+    expect(convs).toHaveLength(9);
+    expect(convs).toContainEqual({ from: "png", to: "avif" });
+    expect(convs).not.toContainEqual({ from: "avif", to: "png" });
   });
 });
 

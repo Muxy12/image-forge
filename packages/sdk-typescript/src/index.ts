@@ -7,7 +7,7 @@
  * enforce authentication (see docs/implementation-progress.md).
  */
 
-export type TargetFormat = "png" | "jpg" | "jpeg" | "webp";
+export type TargetFormat = "png" | "jpg" | "jpeg" | "webp" | "avif";
 
 export interface ImageForgeOptions {
   /** API base URL, e.g. "https://api.imageforge.app". */
@@ -76,7 +76,11 @@ export class ImageForge {
   constructor(options: ImageForgeOptions = {}) {
     this.baseUrl = (options.baseUrl ?? DEFAULT_BASE_URL).replace(/\/$/, "");
     this.apiKey = options.apiKey;
-    const f = options.fetch ?? (globalThis.fetch as typeof fetch | undefined);
+    // Bind the global fetch to its realm; calling a detached `globalThis.fetch`
+    // as a method throws "Illegal invocation" in browsers.
+    const f =
+      options.fetch ??
+      (typeof globalThis.fetch === "function" ? globalThis.fetch.bind(globalThis) : undefined);
     if (!f) {
       throw new Error("No fetch implementation available; pass `fetch` in options.");
     }

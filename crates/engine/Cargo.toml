@@ -9,4 +9,6 @@ description = "ImageForge image conversion engine — HTTP-independent."
 
 [dependencies]
 thiserror.workspace = true
-image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+# "avif" enables AVIF *encoding* (ravif/rav1e, pure Rust). AVIF *decoding* would
+# need dav1d (a C library) via "avif-native", which we deliberately omit.
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "avif"] }

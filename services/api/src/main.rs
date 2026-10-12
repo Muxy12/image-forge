@@ -168,7 +168,8 @@ mod tests {
         let bytes = to_bytes(resp.into_body(), usize::MAX).await.unwrap();
         let json: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
         let items = json["conversions"].as_array().unwrap();
-        assert_eq!(items.len(), 6);
+        // 6 PNG/JPG/WebP cross pairs + 3 X->AVIF encode pairs.
+        assert_eq!(items.len(), 9);
     }
 
     #[tokio::test]
@@ -192,8 +193,9 @@ mod tests {
 
     #[tokio::test]
     async fn convert_unsupported_target_is_415() {
+        // TIFF output is not supported (AVIF now is), so this must be 415.
         let png = png_fixture(8, 8);
-        let body = multipart(&png, "in.png", &[("format", "avif")]);
+        let body = multipart(&png, "in.png", &[("format", "tiff")]);
         let resp = router().oneshot(convert_request(body)).await.unwrap();
         assert_eq!(resp.status(), StatusCode::UNSUPPORTED_MEDIA_TYPE);
         let bytes = to_bytes(resp.into_body(), usize::MAX).await.unwrap();

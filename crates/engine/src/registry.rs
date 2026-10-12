@@ -68,6 +68,29 @@ pub const CAPABILITIES: &[Capability] = &[
         transparency: false,
         lossless: false,
     },
+    // AVIF output (encode only; AVIF decoding would need a C library and is
+    // intentionally not supported). Lossy; alpha preserved from PNG/WebP.
+    Capability {
+        from: ImageFormat::Png,
+        to: ImageFormat::Avif,
+        server_ready: true,
+        transparency: true,
+        lossless: false,
+    },
+    Capability {
+        from: ImageFormat::Jpeg,
+        to: ImageFormat::Avif,
+        server_ready: true,
+        transparency: false,
+        lossless: false,
+    },
+    Capability {
+        from: ImageFormat::WebP,
+        to: ImageFormat::Avif,
+        server_ready: true,
+        transparency: true,
+        lossless: false,
+    },
 ];
 
 /// Look up a capability for a `from -> to` pair.

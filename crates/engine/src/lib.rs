@@ -216,6 +216,19 @@ fn encode(
                 )
                 .map_err(enc_err)?;
         }
+        ImageFormat::Avif => {
+            // AVIF is lossy; quality 1..=100, speed 1 (slow/best) .. 10 (fast).
+            // Speed 6 is a reasonable server-side default. Alpha is preserved.
+            let rgba = image.to_rgba8();
+            image::codecs::avif::AvifEncoder::new_with_speed_quality(&mut out, 6, options.quality)
+                .write_image(
+                    rgba.as_raw(),
+                    rgba.width(),
+                    rgba.height(),
+                    ExtendedColorType::Rgba8,
+                )
+                .map_err(enc_err)?;
+        }
         other => {
             return Err(EngineError::Unsupported { from: other, to });
         }
@@ -323,8 +336,29 @@ mod tests {
 
     #[test]
     fn unsupported_target_fails_cleanly() {
+        // TIFF output is not implemented; must fail cleanly.
         let png = fixture(ImageFormat::Png, 8, 8);
-        let err = convert(&png, ImageFormat::Avif, &ConvertOptions::default()).unwrap_err();
+        let err = convert(&png, ImageFormat::Tiff, &ConvertOptions::default()).unwrap_err();
+        assert!(matches!(err, EngineError::Unsupported { .. }));
+    }
+
+    #[test]
+    fn png_to_avif_produces_avif() {
+        let png = fixture(ImageFormat::Png, 24, 16);
+        let out = convert(&png, ImageFormat::Avif, &ConvertOptions::default()).unwrap();
+        assert_eq!(out.info.to, ImageFormat::Avif);
+        assert_eq!(detect(&out.bytes), Some(ImageFormat::Avif));
+        assert!(!out.bytes.is_empty());
+    }
+
+    #[test]
+    fn avif_source_is_unsupported_for_decoding() {
+        // We can encode AVIF but not decode it; feeding AVIF in must fail
+        // cleanly (before any decode is attempted).
+        let png = fixture(ImageFormat::Png, 16, 16);
+        let avif = convert(&png, ImageFormat::Avif, &ConvertOptions::default()).unwrap();
+        assert_eq!(detect(&avif.bytes), Some(ImageFormat::Avif));
+        let err = convert(&avif.bytes, ImageFormat::Png, &ConvertOptions::default()).unwrap_err();
         assert!(matches!(err, EngineError::Unsupported { .. }));
     }
 

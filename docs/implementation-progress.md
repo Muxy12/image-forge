@@ -76,15 +76,16 @@ observed.
 ## What works (verified)
 
 ### Conversion engine — `crates/engine/` ✅
-Real PNG/JPEG/WebP conversion in all directions, pure Rust (no native libs), so
-it builds and tests in this environment.
+Real PNG/JPEG/WebP conversion in all directions, plus **X→AVIF encoding**
+(ravif/rav1e) — all pure Rust (no native libs), so it builds and tests in this
+environment. AVIF decoding (AVIF→X) is not supported (needs the dav1d C library).
 - Content-sniff format detection (never trusts filenames).
 - Decode with bounded allocation + dimension/pixel limits (decompression-bomb
   guard); byte-size limit; malformed/empty/unknown rejected.
 - Resize (`Inside` preserves aspect, `Exact`), alpha flatten for JPEG, quality
   for lossy targets. WebP output is **lossless** (documented limitation).
 - Capability registry is the single source of truth; `is_supported` gates it.
-- `cargo test -p imageforge-engine` → **15 passed**.
+- `cargo test -p imageforge-engine` → **17 passed**.
 - `cargo clippy -p imageforge-engine -- -D warnings` → clean. `cargo fmt` clean.
 
 ### Browser conversion path — `apps/web/` ✅
@@ -195,7 +196,7 @@ Linux (CI, Fly.io) the same code links and runs normally. Consequences:
 
 ### Rust — repo root
 First `source scripts/dev-env.sh` (Windows linker workaround), then:
-- `cargo test --workspace` ✅ (**40 tests**: engine 15, API 8, job-queue 7, storage 3, database 3, redis-queue 1, worker-core 3) ·
+- `cargo test --workspace` ✅ (**42 tests**: engine 17, API 8, job-queue 7, storage 3, database 3, redis-queue 1, worker-core 3) ·
   `cargo clippy --workspace -- -D warnings` ✅ · `cargo fmt --all --check` ✅ ·
   `cargo build -p imageforge-api` / `cargo run -p imageforge-api` ✅
 
@@ -225,9 +226,10 @@ installing either:
   engine worked (rule #25). Split when a second consumer needs it.
 - **Dashboard, auth/billing:** not started (later phases). Developer SDK +
   `docs/api.md` are in place (Phase 7, partial).
-- **AVIF/HEIC/SVG/TIFF/GIF:** not implemented. AVIF encode needs native libaom
-  (same linker prerequisite); others need more codecs. Both the engine and the
-  SEO registries intentionally exclude them so nothing advertises them.
+- **AVIF:** encoding (X→AVIF) is implemented (ravif/rav1e, pure Rust) and used
+  via the server fallback; AVIF *decoding* (AVIF→X) is not — it needs dav1d (a C
+  library) unavailable under this toolchain. **HEIC/SVG/TIFF/GIF:** not
+  implemented (more codecs needed); the registries exclude them.
 - **Locales:** en/fr/es/de/pt/it all have full message catalogs and SEO
   content. Adding another is a routing entry + a `PACKS` entry + a catalog.
 

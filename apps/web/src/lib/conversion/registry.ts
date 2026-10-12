@@ -10,7 +10,7 @@
  * confirmed available by runtime capability detection (see `browser.ts`).
  */
 
-export type ImageFormatToken = "png" | "jpeg" | "webp";
+export type ImageFormatToken = "png" | "jpeg" | "webp" | "avif";
 
 export interface FormatMeta {
   token: ImageFormatToken;
@@ -26,10 +26,13 @@ export const FORMATS: Record<ImageFormatToken, FormatMeta> = {
   png: { token: "png", label: "PNG", mime: "image/png", supportsAlpha: true, lossy: false },
   jpeg: { token: "jpeg", label: "JPG", mime: "image/jpeg", supportsAlpha: false, lossy: true },
   webp: { token: "webp", label: "WebP", mime: "image/webp", supportsAlpha: true, lossy: true },
+  avif: { token: "avif", label: "AVIF", mime: "image/avif", supportsAlpha: true, lossy: true },
 };
 
+// AVIF is an output-only target: the browser cannot encode it and the engine
+// cannot decode it, so it never appears as an input.
 export const INPUT_FORMATS: readonly ImageFormatToken[] = ["png", "jpeg", "webp"];
-export const OUTPUT_FORMATS: readonly ImageFormatToken[] = ["png", "jpeg", "webp"];
+export const OUTPUT_FORMATS: readonly ImageFormatToken[] = ["png", "jpeg", "webp", "avif"];
 
 export interface Conversion {
   from: ImageFormatToken;
@@ -56,6 +59,8 @@ export function tokenFromMime(mime: string): ImageFormatToken | null {
       return "jpeg";
     case "image/webp":
       return "webp";
+    case "image/avif":
+      return "avif";
     default:
       return null;
   }

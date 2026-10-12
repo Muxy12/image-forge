@@ -30,7 +30,9 @@ Formats involved in supported conversions.
 
 ### `GET /v1/conversions`
 The exact supported `from → to` pairs, derived from the engine registry so the
-API never advertises a conversion it cannot perform.
+API never advertises a conversion it cannot perform. Includes the PNG/JPG/WebP
+cross pairs plus `png|jpg|webp → avif` (AVIF is encode-only; AVIF input is not
+supported).
 ```json
 { "conversions": [ { "from": "png", "to": "webp", "transparency": true, "lossless": true }, ... ] }
 ```
@@ -46,7 +48,7 @@ Multipart fields:
 | field    | required | notes                                             |
 |----------|----------|---------------------------------------------------|
 | `file`   | yes      | image bytes (PNG, JPG, or WebP)                   |
-| `format` | yes      | target token: `png`, `jpg`/`jpeg`, `webp`         |
+| `format` | yes      | target token: `png`, `jpg`/`jpeg`, `webp`, `avif` |
 | `quality`| no       | 1–100 for lossy targets (JPEG); ignored otherwise |
 | `width`  | no       | target width in px (resize)                       |
 | `height` | no       | target height in px (resize)                      |
