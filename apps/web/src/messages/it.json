@@ -18,6 +18,10 @@
     "footer": "Conversione nel browser per PNG, JPG e WebP. AVIF e un'elaborazione lato server per i lotti di grandi dimensioni sono in arrivo."
   },
   "converter": {
+    "convertOnServer": "Converti sul server",
+    "serverNotice": "La tua immagine verrà caricata sul nostro server per questa conversione.",
+    "whereLocal": "Nel tuo browser",
+    "whereServer": "Sul server",
     "dropTitle": "Trascina un'immagine o fai clic per sceglierla",
     "dropHint": "PNG, JPG o WebP · elaborato localmente",
     "source": "Origine",

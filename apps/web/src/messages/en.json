@@ -18,6 +18,10 @@
     "footer": "Browser-side conversion for PNG, JPG, and WebP. AVIF and a server-side path for large and batch jobs are in progress."
   },
   "converter": {
+    "convertOnServer": "Convert on server",
+    "serverNotice": "Your image will be uploaded to our server for this conversion.",
+    "whereLocal": "In your browser",
+    "whereServer": "On the server",
     "dropTitle": "Drop an image or click to choose",
     "dropHint": "PNG, JPG, or WebP · processed locally",
     "source": "Source",

@@ -17,6 +17,7 @@ import {
   sniffFormat,
   type ImageFormatToken,
 } from "@/lib/conversion/registry";
+import { chooseMode, convertOnServer, serverConversionAvailable } from "@/lib/conversion/server";
 
 interface Source {
   file: File;
@@ -38,13 +39,17 @@ export function Converter({ initialTarget = "webp" }: { initialTarget?: ImageFor
   const [quality, setQuality] = useState(82);
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState<string>("");
-  const [result, setResult] = useState<(ConversionResult & { url: string }) | null>(null);
+  const [result, setResult] = useState<
+    (ConversionResult & { url: string; where: "local" | "server" }) | null
+  >(null);
   const [dragging, setDragging] = useState(false);
+  const [serverReady, setServerReady] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const ok = isBrowserConversionAvailable();
     setAvailable(ok);
+    setServerReady(serverConversionAvailable());
     if (ok) {
       detectEncodableFormats(OUTPUT_FORMATS).then(setEncodable);
     }
@@ -129,7 +134,29 @@ export function Converter({ initialTarget = "webp" }: { initialTarget?: ImageFor
       const res = await convertInBrowser(source.file, target, quality);
       setResult((prev) => {
         if (prev) URL.revokeObjectURL(prev.url);
-        return { ...res, url: URL.createObjectURL(res.blob) };
+        return { ...res, url: URL.createObjectURL(res.blob), where: "local" };
+      });
+      setStatus("done");
+    } catch (err) {
+      setStatus("error");
+      setMessage(err instanceof Error ? err.message : t("errFailed"));
+    }
+  }, [source, target, quality, t]);
+
+  const runServerConversion = useCallback(async () => {
+    if (!source) return;
+    if (target === source.format) {
+      setStatus("error");
+      setMessage(t("errPickDifferent"));
+      return;
+    }
+    setStatus("converting");
+    setMessage("");
+    try {
+      const res = await convertOnServer(source.file, target, quality);
+      setResult((prev) => {
+        if (prev) URL.revokeObjectURL(prev.url);
+        return { ...res, url: URL.createObjectURL(res.blob), where: "server" };
       });
       setStatus("done");
     } catch (err) {
@@ -165,6 +192,8 @@ export function Converter({ initialTarget = "webp" }: { initialTarget?: ImageFor
     ? `${source.file.name.replace(/\.[^.]+$/, "")}.${target === "jpeg" ? "jpg" : target}`
     : "converted";
   const delta = result && source ? sizeDeltaPercent(source.size, result.size) : null;
+  // How this target will be converted: locally, via server fallback, or not at all.
+  const mode = chooseMode(encodable.has(target), serverReady);
 
   return (
     <section
@@ -260,15 +289,32 @@ export function Converter({ initialTarget = "webp" }: { initialTarget?: ImageFor
               </label>
             </div>
 
+            {/* When the browser cannot encode the target, offer an explicit
+                server fallback (which uploads the image) with a consent note. */}
+            {mode === "server" && (
+              <p className="text-xs text-amber-700 dark:text-amber-400">{t("serverNotice")}</p>
+            )}
+
             <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => void runConversion()}
-                disabled={status === "converting" || !encodable.has(target)}
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50"
-              >
-                {status === "converting" ? t("converting") : t("convert")}
-              </button>
+              {mode === "server" ? (
+                <button
+                  type="button"
+                  onClick={() => void runServerConversion()}
+                  disabled={status === "converting"}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50"
+                >
+                  {status === "converting" ? t("converting") : t("convertOnServer")}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void runConversion()}
+                  disabled={status === "converting" || mode === "unsupported"}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50"
+                >
+                  {status === "converting" ? t("converting") : t("convert")}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={reset}
@@ -277,6 +323,12 @@ export function Converter({ initialTarget = "webp" }: { initialTarget?: ImageFor
                 {t("reset")}
               </button>
             </div>
+
+            {mode === "unsupported" && (
+              <p className="text-xs text-foreground/50">
+                {FORMATS[target].label} {t("unsupportedOption")}
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -311,6 +363,9 @@ export function Converter({ initialTarget = "webp" }: { initialTarget?: ImageFor
               <dd className="font-medium">{result.durationMs.toFixed(0)} ms</dd>
             </div>
           </dl>
+          <p className="mt-2 text-xs text-foreground/50">
+            {result.where === "server" ? t("whereServer") : t("whereLocal")}
+          </p>
           <a
             href={result.url}
             download={downloadName}

@@ -14,6 +14,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@imageforge/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk-typescript
       next:
         specifier: ^15.5.27
         version: 15.5.27(@types/node@22.20.5)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)

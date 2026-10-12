@@ -55,5 +55,10 @@ curl -X POST http://localhost:8080/v1/convert \
 ## Notes
 - Copy `apps/web/.env.example` and `services/api/.env.example` to `.env*` as
   needed. Never commit real secrets.
+- **Server-side fallback:** set `NEXT_PUBLIC_API_URL` (e.g. in
+  `apps/web/.env.local`) to the running API, and start the API
+  (`cargo run -p imageforge-api`). The browser path handles PNG/JPG/WebP; the
+  fallback only triggers for targets the browser cannot encode, and asks for
+  consent before uploading.
 - Current status and next steps live in
   [`implementation-progress.md`](implementation-progress.md).

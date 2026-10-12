@@ -13,6 +13,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@imageforge/sdk": "workspace:*",
     "next": "^15.5.27",
     "next-intl": "^4",
     "react": "19.0.0",

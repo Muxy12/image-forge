@@ -45,7 +45,21 @@ observed.
   hreflang correct in served HTML (1 canonical, 3 hreflang); sitemap lists only
   the 42 published URLs; `/fr/convertir/png-en-webp` 200 and fully French;
   `/en/convert/png-to-avif` → 404 (unsupported pair is not generated).
-- `pnpm run build` → 47 static pages; `typecheck` and 18 Vitest tests pass.
+- `pnpm run build` → 47 static pages; `typecheck` and 21 Vitest tests pass.
+
+## Server-side fallback (frontend) ✅
+- `lib/conversion/server.ts`: `chooseMode(browserCanEncode, serverAvailable)`
+  → `browser | server | unsupported`, and `convertOnServer` which uploads the
+  file via the typed `@imageforge/sdk` client to `NEXT_PUBLIC_API_URL`.
+- The Converter runs locally when the browser can encode the target; when it
+  cannot and a server is configured, it shows an explicit upload-consent notice
+  and a "Convert on server" button (no silent uploads); otherwise it reports the
+  target as unsupported. The result shows where it ran (browser vs server).
+- `@imageforge/sdk` is a workspace dep transpiled by Next (`transpilePackages`).
+- **Verified end-to-end in the browser:** with the local API running, a
+  cross-origin `POST /v1/convert` from `:3000` → `:8080` returned a valid WebP
+  (CORS allowed) and `avif` returned 415 — the exact path the fallback uses.
+  `chooseMode` is unit-tested (3 cases).
 
 ## Shared layout + language switcher ✅
 - `components/layout/Header.tsx` (brand + switcher, sticky), `Footer.tsx`
