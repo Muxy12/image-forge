@@ -197,8 +197,14 @@ Linux (CI, Fly.io) the same code links and runs normally. Consequences:
   lists 9 pairs, PNG→WebP returned WebP, PNG→AVIF returned AVIF (`ftypavif`),
   `tiff` → 415. **Next:** set `CORS_ALLOWED_ORIGINS` to the Vercel domain once
   the frontend is deployed, so the browser fallback is allowed.
-- **Frontend/worker not deployed yet:** frontend is ready for Vercel; the worker
-  needs cloud backends + the async endpoints first.
+- **FRONTEND DEPLOYED ✅** to Vercel at **https://web-pi-three-63.vercel.app**
+  (root directory `apps/web`): `/` → `/en` (307), SEO pages and sitemap (60
+  URLs) serve. The API CORS allowlist now includes this origin (Fly secret
+  `CORS_ALLOWED_ORIGINS`), verified via the `access-control-allow-origin` header.
+  **Remaining:** set `NEXT_PUBLIC_API_URL=https://imageforge-api.fly.dev` as a
+  Vercel production env var and redeploy, to enable the AVIF server fallback in
+  production.
+- **Worker not deployed:** needs cloud backends + the async endpoints first.
 
 ## CI (Phase 8, partial)
 - `.github/workflows/ci.yml`: a `rust` job (fmt, clippy `-D warnings`, test on
