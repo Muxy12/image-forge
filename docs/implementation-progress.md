@@ -42,7 +42,11 @@ observed.
   FAQPage JSON-LD, breadcrumb nav.
 - Covers the 6 PNG/JPG/WebP cross pairs **plus 3 X→AVIF pairs** (9 conversions
   × 6 locales = 54 pages); AVIF-output pages convert via the server fallback.
-- `app/sitemap.ts` (60 published URLs only), `app/robots.ts`.
+- `app/sitemap.ts` (60 published URLs only), `app/robots.ts`, and `app/llms.txt`
+  (AI-crawler overview, generated from the registry). Home pages now set a
+  self-referencing canonical + hreflang too (not just convert pages).
+- **Prod requirement:** set `NEXT_PUBLIC_SITE_URL` to the real domain on Vercel,
+  else canonical/hreflang/sitemap/llms.txt fall back to `http://localhost:3000`.
 - **Verified in the running app:** `/` → `/en` redirect; titles/canonical/
   hreflang correct in served HTML (1 canonical, 3 hreflang); sitemap lists only
   the 60 published URLs; `/fr/convertir/png-en-webp` 200 and fully French;

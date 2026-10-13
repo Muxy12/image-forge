@@ -1,10 +1,30 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Converter } from "@/components/converter/Converter";
-import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
+import { getPathname, Link } from "@/i18n/navigation";
+import { routing, type Locale } from "@/i18n/routing";
 import { FORMATS } from "@/lib/conversion/registry";
 import { publishedPages } from "@/lib/seo/conversions";
+import { hreflangAlternates, SITE_URL } from "@/lib/seo/site";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const paths: Record<string, string> = {};
+  for (const l of routing.locales) {
+    paths[l] = getPathname({ locale: l, href: "/" });
+  }
+  return {
+    alternates: {
+      canonical: `${SITE_URL}${paths[locale]}`,
+      languages: hreflangAlternates(paths),
+    },
+  };
+}
 
 export default async function Home({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
