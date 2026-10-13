@@ -10,6 +10,7 @@ mod handlers;
 mod middleware;
 
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 use axum::{
     extract::DefaultBodyLimit,
@@ -17,6 +18,13 @@ use axum::{
     Router,
 };
 use tower_http::trace::TraceLayer;
+
+use middleware::RateLimiter;
+
+/// Sustained requests per second, per client IP, on the `/v1` API.
+const RATE_PER_SEC: f64 = 5.0;
+/// Burst allowance per client IP.
+const RATE_BURST: u32 = 30;
 
 /// Maximum accepted request body for the synchronous convert endpoint.
 /// Larger inputs must use the async upload + job path (not yet implemented).
@@ -52,12 +60,22 @@ async fn main() {
 
 /// Build the application router. Separate so it can be exercised in tests.
 fn router() -> Router {
+    let limiter = Arc::new(RateLimiter::new(RATE_PER_SEC, RATE_BURST));
+
+    // Public API, rate-limited per client IP (health checks are exempt).
+    let v1 = Router::new()
+        .route("/formats", get(handlers::formats))
+        .route("/conversions", get(handlers::conversions))
+        .route("/convert", post(handlers::convert))
+        .layer(axum::middleware::from_fn_with_state(
+            limiter,
+            middleware::rate_limit,
+        ));
+
     Router::new()
         .route("/health/live", get(handlers::health_live))
         .route("/health/ready", get(handlers::health_ready))
-        .route("/v1/formats", get(handlers::formats))
-        .route("/v1/conversions", get(handlers::conversions))
-        .route("/v1/convert", post(handlers::convert))
+        .nest("/v1", v1)
         .layer(DefaultBodyLimit::max(MAX_SYNC_BODY_BYTES))
         .layer(middleware::cors_layer())
         .layer(middleware::nosniff_layer())
@@ -255,6 +273,28 @@ mod tests {
             resp.headers().get(header::X_CONTENT_TYPE_OPTIONS).unwrap(),
             "nosniff"
         );
+    }
+
+    #[tokio::test]
+    async fn rate_limit_returns_429_after_burst() {
+        let app = router();
+        let mut last = StatusCode::OK;
+        // No IP headers in these requests → they share one bucket; after the
+        // burst is exhausted the limiter must return 429.
+        for _ in 0..(super::RATE_BURST + 2) {
+            let resp = app
+                .clone()
+                .oneshot(
+                    Request::builder()
+                        .uri("/v1/conversions")
+                        .body(Body::empty())
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+            last = resp.status();
+        }
+        assert_eq!(last, StatusCode::TOO_MANY_REQUESTS);
     }
 
     #[tokio::test]

@@ -44,7 +44,7 @@ same change as this document; **Open** items are tracked with a recommendation.
 | # | Severity | Area | Finding | Status |
 |---|----------|------|---------|--------|
 | 1 | Medium | Frontend | No clickjacking/hardening headers (X-Frame-Options, CSP `frame-ancestors`, nosniff, Referrer-Policy, Permissions-Policy). | **Fixed** |
-| 2 | Medium | API | `/v1/convert` is public with no authentication or rate limiting — abuse/DoS/cost risk. | Open |
+| 2 | Medium | API | `/v1/convert` is public with no authentication or rate limiting — abuse/DoS/cost risk. | **Mitigated** (per-IP rate limit added; API keys still Phase 7) |
 | 3 | Low | Frontend build | `postcss` advisory (GHSA-fxqj-rqcc-2cmp) inside Next's bundled toolchain — **build-time** source-map path traversal, not a served-app exposure. | Open (deferred) |
 | 4 | Low | CI | No automated dependency scanning. | **Fixed** |
 | 5 | Info | API | Error messages include engine detail (e.g. "failed to decode png input") — minor, no sensitive data. | Accepted |
@@ -57,14 +57,15 @@ disabling camera/mic/geolocation/FLoC. A full script/style/connect CSP was
 **not** imposed (risk of breaking Next's inline runtime and the Worker/WASM
 path); see recommendations.
 
-### 2 — Public API without auth/rate limiting (Open)
-Mitigations in place: 25 MiB body cap, engine pixel/dimension/allocation limits,
-and scale-to-zero (bounds idle cost). Still missing: per-IP rate limiting and a
-global concurrency cap, and API keys (Phase 7). Recommended before heavy public
-traffic:
-- a `tower` global concurrency limit + load-shed (cheap DoS backstop),
-- per-IP rate limiting (e.g. `tower_governor`),
-- API keys + per-key quotas (already modelled in the DB schema).
+### 2 — Public API without auth/rate limiting (Mitigated)
+A **per-IP token-bucket rate limiter** now guards the `/v1` routes (sustained
+5 req/s, burst 30 per client IP; health checks exempt), returning `429
+RATE_LIMITED` when exceeded. Client IP is taken from `Fly-Client-IP` /
+`X-Forwarded-For` (proxy-aware). Dependency-free, unit- and integration-tested.
+Combined with the 25 MiB body cap, engine pixel/dimension/allocation limits, and
+scale-to-zero, this bounds abuse and cost. Still recommended for later:
+- API keys + per-key quotas (Phase 7; already modelled in the DB schema),
+- a global concurrency cap + load-shed for extreme bursts.
 
 ### 3 — postcss build-time advisory (Deferred)
 Only reachable at build time via Next's bundled postcss; the deployed app does
