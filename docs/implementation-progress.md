@@ -172,6 +172,17 @@ Linux (CI, Fly.io) the same code links and runs normally. Consequences:
   yet, because doing so would make the API binary link the same set and crash
   locally, breaking the currently-green sync API + its 8 tests.
 
+### Status: paused (2026-10-13)
+The backend crates (db/queue/storage/worker) are built and unit-tested; live
+wiring is paused. Attempted to provision backends on Fly, but the org is on a
+**trial** and Fly blocks add-ons (Upstash Redis, Tigris storage) until a credit
+card is added (`createAddOn ... disabled for trial organizations`). No paid
+resources were created. When resuming, either add a Fly card, or use free
+external services without a card — Neon (Postgres), Upstash (direct), Cloudflare
+R2 / Backblaze B2 (storage) — then wire the async API endpoints and deploy the
+worker. The sync product (frontend + API, incl. AVIF fallback) is fully live and
+unaffected.
+
 ### To finish Phase 5 (needs user action)
 1. Provide `DATABASE_URL` (Neon), `REDIS_URL` (Upstash), and R2_* (Cloudflare) —
    placed in a local `.env` (git-ignored). Then the DB/Redis integration tests
