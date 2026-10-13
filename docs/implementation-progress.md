@@ -192,9 +192,13 @@ Linux (CI, Fly.io) the same code links and runs normally. Consequences:
   native-tls) + `fly.worker.toml`. Deploy only once cloud backends exist and the
   async API endpoints land.
 - `.dockerignore` + step-by-step `docs/deployment.md` (Vercel + Fly CLI).
-- **Not built/deployed here:** the Docker daemon is not running locally and
-  deploys need the maintainer's accounts + explicit approval. The Dockerfiles
-  target Linux, where the whole stack builds normally.
+- **API DEPLOYED ✅** to Fly.io at **https://imageforge-api.fly.dev** (remote
+  Docker build; scale-to-zero). Verified live: health ok, `/v1/conversions`
+  lists 9 pairs, PNG→WebP returned WebP, PNG→AVIF returned AVIF (`ftypavif`),
+  `tiff` → 415. **Next:** set `CORS_ALLOWED_ORIGINS` to the Vercel domain once
+  the frontend is deployed, so the browser fallback is allowed.
+- **Frontend/worker not deployed yet:** frontend is ready for Vercel; the worker
+  needs cloud backends + the async endpoints first.
 
 ## CI (Phase 8, partial)
 - `.github/workflows/ci.yml`: a `rust` job (fmt, clippy `-D warnings`, test on
