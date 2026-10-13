@@ -1,0 +1,22 @@
+# Fly.io config for the ImageForge conversion worker (no public HTTP service).
+# Deploy from the repo root:  fly deploy -c fly.worker.toml
+# Requires DATABASE_URL, REDIS_URL and the R2_* values set as secrets:
+#   fly secrets set -c fly.worker.toml DATABASE_URL=... REDIS_URL=... \
+#     R2_ENDPOINT=... R2_BUCKET=... R2_ACCESS_KEY_ID=... R2_SECRET_ACCESS_KEY=...
+app = "imageforge-worker"
+primary_region = "cdg"
+
+[build]
+  dockerfile = "infra/docker/worker.Dockerfile"
+
+[env]
+  RUST_LOG = "imageforge_worker=info"
+
+# Background worker: one process, no exposed ports.
+[processes]
+  worker = "imageforge-worker"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+  processes = ["worker"]

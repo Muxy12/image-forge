@@ -1,0 +1,17 @@
+# Keep the Docker build context small and reproducible.
+.git
+target
+**/target
+node_modules
+**/node_modules
+.next
+**/.next
+.turbo
+**/.turbo
+out
+dist
+*.log
+.env
+.env.*
+!.env.example
+apps/web

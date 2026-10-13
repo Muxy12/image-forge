@@ -182,6 +182,20 @@ Linux (CI, Fly.io) the same code links and runs normally. Consequences:
 3. Then add the API async endpoints: `POST /v1/uploads` (presign), `POST
    /v1/jobs`, `GET /v1/jobs/{id}`, `GET /v1/jobs/{id}/download`.
 
+## Deployment artifacts (Phase 8, partial)
+- **Frontend → Vercel:** `apps/web/vercel.json` (Next.js). Deployable now; it is
+  self-sufficient (browser conversions need no backend). `NEXT_PUBLIC_API_URL`
+  is optional (server fallback only).
+- **API → Fly.io:** `infra/docker/api.Dockerfile` (multi-stage; pure-Rust, no
+  system libs) + `fly.api.toml`. Stateless, scale-to-zero, `/health/live` check.
+- **Worker → Fly.io:** `infra/docker/worker.Dockerfile` (adds OpenSSL for
+  native-tls) + `fly.worker.toml`. Deploy only once cloud backends exist and the
+  async API endpoints land.
+- `.dockerignore` + step-by-step `docs/deployment.md` (Vercel + Fly CLI).
+- **Not built/deployed here:** the Docker daemon is not running locally and
+  deploys need the maintainer's accounts + explicit approval. The Dockerfiles
+  target Linux, where the whole stack builds normally.
+
 ## CI (Phase 8, partial)
 - `.github/workflows/ci.yml`: a `rust` job (fmt, clippy `-D warnings`, test on
   `ubuntu-latest` — Linux uses the system linker, so no Windows-gnu workaround
