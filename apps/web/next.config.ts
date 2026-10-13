@@ -14,8 +14,18 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: [
+          // Cross-origin isolation for the WebAssembly/Worker conversion path.
           { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
           { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+          // Baseline hardening.
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+          },
         ],
       },
     ];
